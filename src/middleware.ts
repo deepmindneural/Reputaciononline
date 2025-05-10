@@ -17,9 +17,18 @@ export async function middleware(request: NextRequest) {
   // Rutas que requieren autenticación
   const isProtectedRoute = path.startsWith('/dashboard') || path.startsWith('/admin');
   
+  // Verificar el rol de usuario para rutas de administrador
+  const isAdminRoute = path.startsWith('/admin');
+  const isAdmin = session?.role === 'admin';
+  
   // Redirecciones específicas para mejorar la navegación
   if (path === '/dashboard' && isAuthenticated) {
-    // Redirección para la ruta /dashboard exacta
+    // Redirección para la ruta /dashboard exacta - asegurándonos de usar la ruta correcta
+    return NextResponse.redirect(new URL('/dashboard/menciones', request.url));
+  }
+  
+  // Si es ruta de admin y el usuario no es admin, redirigir al dashboard
+  if (isAdminRoute && isAuthenticated && !isAdmin) {
     return NextResponse.redirect(new URL('/dashboard/menciones', request.url));
   }
   

@@ -84,12 +84,26 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async redirect({ url, baseUrl }) {
-      // Redirigir correctamente a la página de menciones
-      if (url === "/dashboard") return `${baseUrl}/dashboard/menciones`;
-      // Mantener la URL tal como está para la página de menciones
-      if (url === "/dashboard/menciones") return `${baseUrl}/dashboard/menciones`;
-      // Para usuarios admin, mantenemos la redirección a su panel
-      if (url === "/admin/creditos") return `${baseUrl}/admin/creditos`;
+      // Aplicamos redirecciones especiales para rutas internas
+      if (url.includes('/dashboard')) {
+        // Si es una ruta de dashboard exacta, redirigir a menciones
+        if (url === '/dashboard' || url === `${baseUrl}/dashboard`) {
+          return `${baseUrl}/dashboard/menciones`;
+        }
+        // Para otras rutas específicas del dashboard, mantener el mismo destino
+        if (url.includes('/menciones')) return `${baseUrl}/dashboard/menciones`;
+        if (url.includes('/creditos')) return `${baseUrl}/dashboard/creditos`;
+        if (url.includes('/redes-sociales')) return `${baseUrl}/dashboard/redes-sociales`;
+        if (url.includes('/perfil')) return `${baseUrl}/dashboard/perfil`;
+      }
+      
+      // Para usuarios admin, dirigir a su panel
+      if (url.includes('/admin')) {
+        if (url.includes('/creditos')) return `${baseUrl}/admin/creditos`;
+        if (url.includes('/usuarios')) return `${baseUrl}/admin/usuarios`;
+        if (url === '/admin' || url === `${baseUrl}/admin`) return `${baseUrl}/admin/creditos`;
+      }
+      
       // Aseguramos que las rutas relativas permanezcan dentro del mismo dominio
       if (url.startsWith('/')) return `${baseUrl}${url}`;
       return url;

@@ -52,14 +52,27 @@ export default function LoginPage() {
         setTimeout(async () => {
           try {
             // Usar NextAuth para iniciar sesión con credenciales
-            // Cambiamos a redirección automática para evitar problemas con la sesión
-            await signIn('credentials', {
-              redirect: true,
-              callbackUrl: tipoUsuario === 'admin' ? '/admin/creditos' : '/',  // Redirigimos a la raíz para usuarios regulares
+            // Manejo manual de redirección para más control sobre la navegación
+            const result = await signIn('credentials', {
+              redirect: false, // Desactivamos la redirección automática para mayor control
               email: correo,
               password: contrasena,
               userType: tipoUsuario, // Enviar el tipo de usuario seleccionado
             });
+            
+            // Si el inicio de sesión fue exitoso, redirigir según el tipo de usuario
+            if (result?.ok) {
+              // Redirigir según el tipo de usuario
+              if (tipoUsuario === 'admin') {
+                router.push('/admin/creditos'); // Para administradores
+              } else {
+                router.push('/dashboard/menciones'); // Para usuarios regulares
+              }
+            } else {
+              // Si hay error, mostrar mensaje
+              setMostrarError(true);
+              setMensajeError(result?.error || 'Credenciales incorrectas');
+            }
             
             // No es necesario manejar la redirección manual ya que signIn con redirect:true lo hace
             // Esto sólo se ejecutará si hay algún problema con la redirección automática
