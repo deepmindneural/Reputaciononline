@@ -1,0 +1,165 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { FaChartLine, FaShieldAlt, FaRocket, FaCheck, FaUsers, FaComments, FaTwitter, FaFacebook, FaInstagram, FaLinkedin, FaTiktok, FaStar, FaQuoteLeft } from 'react-icons/fa';
+import LandingNavbar from '@/components/layout/LandingNavbar';
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Usando el componente LandingNavbar */}
+      <LandingNavbar />
+      
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-cyan-600 to-blue-700 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative z-10 pt-8 pb-16 sm:pt-16 sm:pb-24 lg:pt-24 lg:pb-32 md:flex md:items-center">
+            <div className="md:w-1/2 px-4 sm:px-6 lg:px-8">
+              <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
+                <span className="block">Controla y mejora tu</span>
+                <span className="block text-cyan-200">reputaciu00f3n digital</span>
+              </h1>
+              <p className="mt-3 text-base text-white sm:mt-5 sm:text-lg md:mt-5 md:text-xl">
+                La plataforma integral que monitorea, analiza y optimiza tu presencia en redes sociales y medios digitales.
+              </p>
+              <div className="mt-8 flex space-x-4">
+                <a href="#planes" className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-cyan-800 bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10">
+                  Ver planes
+                </a>
+                <Link
+                  href="/login"
+                  className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-cyan-900 bg-opacity-60 hover:bg-opacity-70 md:py-4 md:text-lg md:px-10"
+                >
+                  Iniciar ahora
+                </Link>
+              </div>
+            </div>
+            <div className="md:w-1/2 mt-12 md:mt-0 px-4 sm:px-6 lg:px-8">
+              <img
+                className="w-full h-auto object-cover rounded-lg shadow-xl"
+                src="https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                alt="Monitoreo de redes sociales"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Secciu00f3n de caracteru00edsticas */}
+      <section id="caracteristicas" className="py-16 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+              Caracteru00edsticas principales
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
+              Todo lo que necesitas para gestionar y mejorar tu reputaciu00f3n digital en un solo lugar.
+            </p>
+          </div>
+
+          <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {/* Caracteru00edstica 1 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaChartLine className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Monitoreo en tiempo real</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Seguimiento constante de menciones, comentarios y tendencias relacionadas con tu marca en todas las redes sociales.
+              </p>
+              <div className="mt-4 flex space-x-2">
+                <FaTwitter className="text-blue-400" title="X (Twitter)" />
+                <FaFacebook className="text-blue-600" title="Facebook" />
+                <FaInstagram className="text-pink-500" title="Instagram" />
+                <FaLinkedin className="text-blue-700" title="LinkedIn" />
+                <FaTiktok className="text-black dark:text-white" title="TikTok" />
+              </div>
+            </div>
+
+            {/* Caracteru00edstica 2 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaShieldAlt className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Alerta de crisis</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Notificaciones inmediatas ante posibles situaciones negativas para tu reputaciu00f3n, permitiu00e9ndote actuar ru00e1pidamente y prevenir crisis de imagen.
+              </p>
+            </div>
+
+            {/* Caracteru00edstica 3 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaUsers className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Anu00e1lisis de audiencia</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Comprende a tu pu00fablico objetivo con datos demogru00e1ficos detallados, intereses y comportamientos online.
+              </p>
+            </div>
+
+            {/* Caracteru00edstica 4 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaComments className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Anu00e1lisis de sentimiento</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Evaluaciu00f3n automatizada de la percepciu00f3n positiva, negativa o neutral de las menciones sobre tu marca.
+              </p>
+            </div>
+
+            {/* Caracteru00edstica 5 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaRocket className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Sofia IA</h3>
+              <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
+                Nuestro avanzado asistente de inteligencia artificial diseu00f1ado especu00edficamente para el monitoreo y gestiu00f3n de reputaciu00f3n online, con capacidades predictivas y anu00e1lisis semu00e1ntico avanzado para optimizar el uso de tus cru00e9ditos.
+              </p>
+              <div className="mt-4 text-gray-600 dark:text-gray-400 text-sm">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Procesamiento de lenguaje natural</li>
+                  <li>Anu00e1lisis predictivo de tendencias</li>
+                  <li>Recomendaciones personalizadas</li>
+                  <li>Respuestas a consultas en tiempo real</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Caracteru00edstica 6 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaChartLine className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Informes personalizados</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Genera informes detallados adaptados a tus necesidades especu00edficas, con visualizaciones claras y datos accionables.
+              </p>
+            </div>
+            
+            {/* Caracteru00edstica 7 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <svg className="text-xl" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22ZM12 20C14.1217 20 16.1566 19.1571 17.6569 17.6569C19.1571 16.1566 20 14.1217 20 12C20 9.87827 19.1571 7.84344 17.6569 6.34315C16.1566 4.84285 14.1217 4 12 4C9.87827 4 7.84344 4.84285 6.34315 6.34315C4.84285 7.84344 4 9.87827 4 12C4 14.1217 4.84285 16.1566 6.34315 17.6569C7.84344 19.1571 9.87827 20 12 20ZM12 18C10.4087 18 8.88258 17.3679 7.75736 16.2426C6.63214 15.1174 6 13.5913 6 12C6 10.4087 6.63214 8.88258 7.75736 7.75736C8.88258 6.63214 10.4087 6 12 6C13.5913 6 15.1174 6.63214 16.2426 7.75736C17.3679 8.88258 18 10.4087 18 12C18 13.5913 17.3679 15.1174 16.2426 16.2426C15.1174 17.3679 13.5913 18 12 18ZM13 16H15V14H13C12.2044 14 11.4413 13.6839 10.8787 13.1213C10.3161 12.5587 10 11.7956 10 11V8H8V10H10V11C10 11.5304 10.2107 12.0391 10.5858 12.4142C10.9609 12.7893 11.4696 13 12 13H13V16Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Gestiu00f3n de Cru00e9ditos</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Sistema completo para administrar tus cru00e9ditos disponibles, visualizar gastos, histu00f3rico de transacciones y recomendaciones para optimizar tu inversiu00f3n.
+              </p>
+              <div className="mt-4 text-gray-600 dark:text-gray-400 text-sm">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Visualizaciu00f3n de cru00e9ditos disponibles y usados</li>
+                  <li>Historial detallado de transacciones</li>
+                  <li>Anu00e1lisis de consumo con gru00e1ficos</li>
+                  <li>Compra y gestiu00f3n de nuevos planes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>

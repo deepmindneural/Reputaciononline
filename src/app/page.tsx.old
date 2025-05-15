@@ -1,0 +1,536 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { FaChartLine, FaShieldAlt, FaRocket, FaCheck, FaUsers, FaComments, FaTwitter, FaFacebook, FaInstagram, FaLinkedin, FaTiktok, FaStar, FaQuoteLeft } from 'react-icons/fa';
+import LandingNavbar from '@/components/layout/LandingNavbar';
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Usando el componente LandingNavbar */}
+      <LandingNavbar />
+      
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-cyan-600 to-blue-700 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative z-10 pt-8 pb-16 sm:pt-16 sm:pb-24 lg:pt-24 lg:pb-32 md:flex md:items-center">
+            <div className="md:w-1/2 px-4 sm:px-6 lg:px-8">
+              <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
+                <span className="block">Controla y mejora tu</span>
+                <span className="block text-cyan-200">reputación digital</span>
+              </h1>
+              <p className="mt-3 text-base text-white sm:mt-5 sm:text-lg md:mt-5 md:text-xl">
+                La plataforma integral que monitorea, analiza y optimiza tu presencia en redes sociales y medios digitales.
+              </p>
+              <div className="mt-8 flex space-x-4">
+                <a href="#planes" className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-cyan-800 bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10">
+                  Ver planes
+                </a>
+                <Link
+                  href="/login"
+                  className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-cyan-900 bg-opacity-60 hover:bg-opacity-70 md:py-4 md:text-lg md:px-10"
+                >
+                  Iniciar ahora
+                </Link>
+              </div>
+            </div>
+            <div className="md:w-1/2 mt-12 md:mt-0 px-4 sm:px-6 lg:px-8">
+              <img
+                className="w-full h-auto object-cover rounded-lg shadow-xl"
+                src="https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                alt="Monitoreo de redes sociales"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Sección de características */}
+      <section id="caracteristicas" className="py-16 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+              Características principales
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
+              Todo lo que necesitas para gestionar y mejorar tu reputación digital en un solo lugar.
+            </p>
+          </div>
+
+          <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {/* Característica 1 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaChartLine className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Monitoreo en tiempo real</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Seguimiento constante de menciones, comentarios y tendencias relacionadas con tu marca en todas las redes sociales.
+              </p>
+              <div className="mt-4 flex space-x-2">
+                <FaTwitter className="text-blue-400" title="X (Twitter)" />
+                <FaFacebook className="text-blue-600" title="Facebook" />
+                <FaInstagram className="text-pink-500" title="Instagram" />
+                <FaLinkedin className="text-blue-700" title="LinkedIn" />
+                <FaTiktok className="text-black dark:text-white" title="TikTok" />
+              </div>
+            </div>
+
+            {/* Característica 2 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaShieldAlt className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Alerta de crisis</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Notificaciones inmediatas ante posibles situaciones negativas para tu reputación, permitiéndote actuar rápidamente y prevenir crisis de imagen.
+              </p>
+            </div>
+
+            {/* Característica 3 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaUsers className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Análisis de audiencia</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Comprende a tu público objetivo con datos demográficos detallados, intereses y comportamientos online.
+              </p>
+            </div>
+
+            {/* Característica 4 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaComments className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Análisis de sentimiento</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Evaluación automatizada de la percepción positiva, negativa o neutral de las menciones sobre tu marca.
+              </p>
+            </div>
+
+            {/* Característica 5 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaRocket className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Sofia IA</h3>
+              <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
+                Nuestro avanzado asistente de inteligencia artificial diseñado específicamente para el monitoreo y gestión de reputación online, con capacidades predictivas y análisis semántico avanzado.
+              </p>
+              <div className="mt-4 text-gray-600 dark:text-gray-400 text-sm">
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Procesamiento de lenguaje natural</li>
+                  <li>Análisis predictivo de tendencias</li>
+                  <li>Recomendaciones personalizadas</li>
+                  <li>Respuestas a consultas en tiempo real</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Característica 6 */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div className="text-cyan-500 p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                <FaChartLine className="text-xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Informes personalizados</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Genera informes detallados adaptados a tus necesidades específicas, con visualizaciones claras y datos accionables.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección de planes */}
+      <section id="planes" className="py-16 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+              Planes y precios
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
+              Elige el plan que mejor se adapte a tus necesidades y objetivos.
+            </p>
+          </div>
+
+          <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Plan Básico */}
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
+              <div className="px-6 py-8 bg-white dark:bg-gray-900 sm:p-10 sm:pb-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center">Básico</h3>
+                <div className="mt-4 flex justify-center">
+                  <span className="text-5xl font-extrabold text-gray-900 dark:text-white">$299.000</span>
+                  <span className="ml-1 text-xl font-medium text-gray-500 dark:text-gray-400 self-end">COP</span>
+                </div>
+                <p className="mt-5 text-lg text-gray-500 dark:text-gray-400 text-center">Para emprendedores y pequeñas marcas</p>
+              </div>
+              <div className="px-6 pt-6 pb-8 bg-gray-50 dark:bg-gray-800 sm:p-10 sm:pt-6">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      5.000 créditos
+                    </p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      Monitoreo de 2 redes sociales
+                    </p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      Reportes básicos
+                    </p>
+                  </li>
+                </ul>
+                <div className="mt-8">
+                  <Link
+                    href="/login"
+                    className="w-full inline-flex justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
+                    Comenzar ahora
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Plan Profesional */}
+            <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
+              <div className="absolute top-0 right-0 pt-2 pr-4">
+                <span className="inline-flex px-3 py-1 text-xs font-semibold leading-5 tracking-wide uppercase bg-cyan-100 dark:bg-cyan-800 text-cyan-800 dark:text-cyan-100 rounded-full">
+                  Popular
+                </span>
+              </div>
+              <div className="px-6 py-8 bg-white dark:bg-gray-900 sm:p-10 sm:pb-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center">Profesional</h3>
+                <div className="mt-4 flex justify-center">
+                  <span className="text-5xl font-extrabold text-gray-900 dark:text-white">$699.000</span>
+                  <span className="ml-1 text-xl font-medium text-gray-500 dark:text-gray-400 self-end">COP</span>
+                </div>
+                <p className="mt-5 text-lg text-gray-500 dark:text-gray-400 text-center">Para negocios y profesionales</p>
+              </div>
+              <div className="px-6 pt-6 pb-8 bg-gray-50 dark:bg-gray-800 sm:p-10 sm:pt-6">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      15.000 créditos
+                    </p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      Monitoreo de todas las redes sociales
+                    </p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      Análisis de sentimiento avanzado
+                    </p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      Asistente Sofia IA
+                    </p>
+                  </li>
+                </ul>
+                <div className="mt-8">
+                  <Link
+                    href="/login"
+                    className="w-full inline-flex justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
+                    Comenzar ahora
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Plan Empresarial */}
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
+              <div className="px-6 py-8 bg-white dark:bg-gray-900 sm:p-10 sm:pb-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center">Empresarial</h3>
+                <div className="mt-4 flex justify-center">
+                  <span className="text-5xl font-extrabold text-gray-900 dark:text-white">$1.499.000</span>
+                  <span className="ml-1 text-xl font-medium text-gray-500 dark:text-gray-400 self-end">COP</span>
+                </div>
+                <p className="mt-5 text-lg text-gray-500 dark:text-gray-400 text-center">Para empresas y organizaciones</p>
+              </div>
+              <div className="px-6 pt-6 pb-8 bg-gray-50 dark:bg-gray-800 sm:p-10 sm:pt-6">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      50.000 créditos
+                    </p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      Monitoreo ilimitado en todas las plataformas
+                    </p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      Análisis predictivo
+                    </p>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <FaCheck className="h-5 w-5 text-cyan-500" />
+                    </div>
+                    <p className="ml-3 text-base text-gray-700 dark:text-gray-300">
+                      Soporte prioritario 24/7
+                    </p>
+                  </li>
+                </ul>
+                <div className="mt-8">
+                  <Link
+                    href="/login"
+                    className="w-full inline-flex justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
+                    Comenzar ahora
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección de canales de monitoreo */}
+      <section className="py-16 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+              Redes sociales y canales monitoreados
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
+              Vigilamos todas las plataformas relevantes para tu marca con análisis en tiempo real e histórico
+            </p>
+          </div>
+
+          <div className="mt-12 grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
+            <div className="flex flex-col items-center">
+              <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-full">
+                <FaTwitter className="h-10 w-10 text-blue-400" />
+              </div>
+              <span className="mt-2 text-gray-700 dark:text-gray-300">X (Twitter)</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Monitoreo completo de menciones, hashtags y tendencias</p>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-full">
+                <FaFacebook className="h-10 w-10 text-blue-600" />
+              </div>
+              <span className="mt-2 text-gray-700 dark:text-gray-300">Facebook</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Seguimiento de comentarios en páginas y grupos relevantes</p>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="p-4 bg-pink-100 dark:bg-pink-900 rounded-full">
+                <FaInstagram className="h-10 w-10 text-pink-500" />
+              </div>
+              <span className="mt-2 text-gray-700 dark:text-gray-300">Instagram</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Análisis de contenido visual y menciones en stories</p>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-full">
+                <FaLinkedin className="h-10 w-10 text-blue-700" />
+              </div>
+              <span className="mt-2 text-gray-700 dark:text-gray-300">LinkedIn</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Monitoreo de contenido profesional y corporativo</p>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-full">
+                <FaTiktok className="h-10 w-10 text-black dark:text-white" />
+              </div>
+              <span className="mt-2 text-gray-700 dark:text-gray-300">TikTok</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Seguimiento de tendencias virales y opiniones</p>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="p-4 bg-cyan-100 dark:bg-cyan-900 rounded-full">
+                <svg className="h-10 w-10 text-cyan-500" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.5 2H14V7H5V15.5H5.82L6 16.5H3V19H15V16H8V10H21V13.53C21.17 13.62 21.33 13.72 21.5 13.83V7L17.5 2ZM16 5V3.5L18.5 6H16V5Z" />
+                  <path d="M16.5 10C14 10 12 12 12 14.5C12 17 14 19 16.5 19C19 19 21 17 21 14.5C21 12 19 10 16.5 10ZM16.5 16.5L14 13.9L14.7 13.05L16.07 14.69L19.24 12.03L19.95 12.87L16.5 16.5Z" />
+                </svg>
+              </div>
+              <span className="mt-2 text-gray-700 dark:text-gray-300">Noticias</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Monitoreo de medios digitales y prensa online</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección de testimonios */}
+      <section id="testimonios" className="py-16 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+              Lo que dicen nuestros clientes
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
+              Casos de éxito y testimonios de quienes confían en nuestra plataforma
+            </p>
+          </div>
+
+          <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
+            {/* Testimonio 1 */}
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="text-cyan-500 mr-4">
+                  <FaQuoteLeft className="h-8 w-8" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="text-yellow-400 h-4 w-4" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                "Reputación Online nos ha permitido anticiparnos a crisis potenciales y mantener una comunicación efectiva con nuestra audiencia. Su herramienta Sofia IA ha sido fundamental para interpretar los datos correctamente."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-cyan-600 font-bold">MC</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">María Camargo</h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">Directora de Comunicaciones, Empresa Verde</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonio 2 */}
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="text-cyan-500 mr-4">
+                  <FaQuoteLeft className="h-8 w-8" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="text-yellow-400 h-4 w-4" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                "El monitoreo en tiempo real de todas las redes sociales nos ha dado una ventaja competitiva enorme. Ahora podemos responder rápidamente a las tendencias y mejorar nuestra estrategia digital de forma constante."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-cyan-600 font-bold">JR</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">Juan Ramírez</h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">Gerente de Marketing, Grupo Innovador</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonio 3 */}
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="text-cyan-500 mr-4">
+                  <FaQuoteLeft className="h-8 w-8" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="text-yellow-400 h-4 w-4" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                "Los informes personalizados y el análisis de sentimiento han sido claves para entender cómo nos percibe el público. Sofia IA detectó patrones negativos que pudimos corregir rápidamente. Gracias a Reputación Online, hemos mejorado significativamente nuestra imagen de marca."
+              </p>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-cyan-600 font-bold">LG</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">Laura Gómez</h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">CEO, Consultores Digitales</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer/CTA */}
+      <section className="bg-cyan-600 dark:bg-cyan-800">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <span className="block">¿Listo para mejorar tu reputación digital?</span>
+            <span className="block text-cyan-200">Comienza hoy mismo.</span>
+          </h2>
+          <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+            <div className="inline-flex rounded-md shadow">
+              <Link
+                href="/registro"
+                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-cyan-600 bg-white hover:bg-gray-50"
+              >
+                Registrarse
+              </Link>
+            </div>
+            <div className="ml-3 inline-flex rounded-md shadow">
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-cyan-800 hover:bg-cyan-900"
+              >
+                Iniciar sesión
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* Footer */}
+      <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+          <div className="md:flex md:items-center md:justify-between">
+            <div className="flex justify-center md:justify-start">
+              <h2 className="text-xl font-bold text-cyan-600 dark:text-cyan-400">Reputación Online</h2>
+            </div>
+            <div className="mt-8 md:mt-0">
+              <p className="text-center text-base text-gray-500 dark:text-gray-400">&copy; 2025 Reputación Online. Todos los derechos reservados.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

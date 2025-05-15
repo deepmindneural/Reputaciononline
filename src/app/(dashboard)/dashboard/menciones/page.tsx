@@ -1,0 +1,508 @@
+"use client";
+
+import React, { useState } from 'react';
+import { 
+  FaFacebook, 
+  FaInstagram, 
+  FaLinkedin, 
+  FaTiktok, 
+  FaNewspaper,
+  FaFilter,
+  FaSearch,
+  FaCalendarAlt,
+  FaDownload,
+  FaSort,
+  FaListAlt,
+  FaTh,
+  FaBookmark,
+  FaBell
+} from 'react-icons/fa';
+
+// Tipos para el componente
+type SentimentType = 'positivo' | 'negativo' | 'neutral';
+type SocialNetworkType = 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok' | 'news';
+
+interface MencionItemProps {
+  id: string;
+  author: string;
+  authorUsername?: string;
+  authorImage?: string;
+  content: string;
+  date: string;
+  network: SocialNetworkType;
+  sentiment: SentimentType;
+  engagement: {
+    likes?: number;
+    comments?: number;
+    shares?: number;
+    reposts?: number;
+  };
+  relevance: number; // 0-100
+}
+
+// Componente MencionItem incrustado directamente 
+const MencionItem: React.FC<MencionItemProps> = ({
+  author,
+  authorUsername,
+  authorImage,
+  content,
+  date,
+  network,
+  sentiment,
+  engagement,
+  relevance
+}) => {
+  // Obtener el icono de la red social
+  const getNetworkIcon = () => {
+    switch(network) {
+      case 'x':
+        return <img src="/images/social/x-logo.png" alt="X" className="w-4 h-4" />;
+      case 'facebook':
+        return <FaFacebook className="text-[#1877F2]" />;
+      case 'instagram':
+        return <FaInstagram className="text-[#E1306C]" />;
+      case 'linkedin':
+        return <FaLinkedin className="text-[#0077B5]" />;
+      case 'tiktok':
+        return <FaTiktok className="text-[#000000]" />;
+      case 'news':
+        return <FaNewspaper className="text-gray-700 dark:text-gray-300" />;
+      default:
+        return <img src="/images/social/x-logo.png" alt="X" className="w-4 h-4" />;
+    }
+  };
+  
+  // Obtener la clase de color según el sentimiento
+  const getSentimentClass = () => {
+    switch(sentiment) {
+      case 'positivo':
+        return 'border-green-500 bg-green-50 dark:bg-green-900/20';
+      case 'negativo':
+        return 'border-red-500 bg-red-50 dark:bg-red-900/20';
+      case 'neutral':
+        return 'border-gray-500 bg-gray-50 dark:bg-gray-800';
+      default:
+        return 'border-gray-300 bg-white dark:bg-gray-800';
+    }
+  };
+  
+  // Obtener el componente indicador de sentimiento
+  const getSentimentIndicator = () => {
+    switch(sentiment) {
+      case 'positivo':
+        return <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>;
+      case 'negativo':
+        return <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>;
+      case 'neutral':
+        return <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className={`border-l-4 ${getSentimentClass()} p-4 rounded-lg mb-4 hover:shadow-md transition-shadow`}>
+      <div>
+        <div className="flex justify-between">
+          <div className="flex items-center mb-2">
+            {getSentimentIndicator()}
+            <span className="text-sm font-medium capitalize">
+              {sentiment}
+              {relevance > 0 && (
+                <span className="ml-2 text-gray-500 dark:text-gray-400 text-xs">
+                  Relevancia: {relevance}%
+                </span>
+              )}
+            </span>
+            <div className="ml-auto">
+              <button className="text-gray-400 hover:text-primary-500 dark:hover:text-primary-400">
+                <FaBookmark />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Contenido de la mención */}
+        <div className="mb-4">
+          <p className="text-gray-800 dark:text-gray-200">
+            {content}
+          </p>
+        </div>
+
+        {/* Información del autor */}
+        <div>
+          <div className="flex items-center">
+            <span className="font-medium text-gray-900 dark:text-white">{author}</span>
+            {authorUsername && (
+              <span className="ml-1 text-gray-500 dark:text-gray-400 text-sm">
+                @{authorUsername}
+              </span>
+            )}
+            <span className="mx-2 text-gray-400">•</span>
+            <span className="text-gray-500 dark:text-gray-400 text-sm">{date}</span>
+          </div>
+          <div className="flex items-center mt-0.5">
+            <span className="text-lg mr-1">{getNetworkIcon()}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+              {network === 'news' ? 'Noticia' : network === 'x' ? 'X' : network}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Datos para mostrar en la interfaz
+const menciones: MencionItemProps[] = [
+  {
+    id: '1',
+    author: 'María García',
+    authorUsername: 'MariaGarcia',
+    content: 'Las propuestas de @CarlosRodriguezG sobre educación son exactamente lo que necesitamos. Por fin alguien que entiende los problemas reales! #EleccionesSenado2026',
+    date: 'Hace 35 minutos',
+    network: 'x',
+    sentiment: 'positivo',
+    engagement: {
+      likes: 48,
+      reposts: 12,
+      comments: 5
+    },
+    relevance: 82
+  },
+  {
+    id: '2',
+    author: 'Pedro Gómez',
+    authorUsername: 'PedroGomezL',
+    content: 'Me gusta el enfoque de @CarlosRodriguezG sobre innovación tecnológica en su programa. Sin embargo, me gustaría ver más detalles sobre implementación. #Senado2026 #Tecnología',
+    date: 'Hace 2 horas',
+    network: 'facebook',
+    sentiment: 'neutral',
+    engagement: {
+      likes: 78,
+      comments: 23,
+      shares: 5
+    },
+    relevance: 75
+  },
+  {
+    id: '3',
+    author: 'El Tiempo',
+    content: 'Carlos Rodríguez presenta su plan de gobierno para el Senado, centrándose en educación, innovación y sostenibilidad ambiental. El candidato promete cambios significativos en el sistema educativo.',
+    date: 'Hace 5 horas',
+    network: 'news',
+    sentiment: 'neutral',
+    engagement: {
+      likes: 56,
+      reposts: 7,
+      comments: 19
+    },
+    relevance: 68
+  }
+];
+
+export default function MencionesPage() {
+  const [filteredMenciones, setFilteredMenciones] = useState(menciones);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedNetworks, setSelectedNetworks] = useState<string[]>([]);
+  const [selectedSentiment, setSelectedSentiment] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState('recientes');
+  const [viewMode, setViewMode] = useState('list'); // 'list' o 'grid'
+
+  // Red social total de menciones
+  const networkCounts = {
+    x: menciones.filter(m => m.network === 'x').length,
+    facebook: menciones.filter(m => m.network === 'facebook').length,
+    instagram: menciones.filter(m => m.network === 'instagram').length,
+    linkedin: menciones.filter(m => m.network === 'linkedin').length,
+    tiktok: menciones.filter(m => m.network === 'tiktok').length,
+    news: menciones.filter(m => m.network === 'news').length
+  };
+
+  // Sentimiento total de menciones
+  const sentimentCounts = {
+    positivo: menciones.filter(m => m.sentiment === 'positivo').length,
+    neutral: menciones.filter(m => m.sentiment === 'neutral').length,
+    negativo: menciones.filter(m => m.sentiment === 'negativo').length
+  };
+
+  // Filtrar menciones según la búsqueda y los filtros seleccionados
+  const filterMenciones = () => {
+    let result = [...menciones];
+    
+    // Filtrar por búsqueda
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(mencion => {
+        return (
+          mencion.content.toLowerCase().includes(query) ||
+          mencion.author.toLowerCase().includes(query) ||
+          (mencion.authorUsername && mencion.authorUsername.toLowerCase().includes(query))
+        );
+      });
+    }
+    
+    // Filtrar por redes sociales seleccionadas
+    if (selectedNetworks.length > 0) {
+      result = result.filter(mencion => selectedNetworks.includes(mencion.network));
+    }
+    
+    // Filtrar por sentimiento
+    if (selectedSentiment.length > 0) {
+      result = result.filter(mencion => selectedSentiment.includes(mencion.sentiment));
+    }
+    
+    // Ordenar
+    switch(sortBy) {
+      case 'recientes':
+        result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        break;
+      case 'relevantes':
+        result.sort((a, b) => b.relevance - a.relevance);
+        break;
+      case 'engagement':
+        result.sort((a, b) => {
+          const engA = (a.engagement.likes || 0) + (a.engagement.comments || 0) + (a.engagement.shares || 0) + (a.engagement.reposts || 0);
+          const engB = (b.engagement.likes || 0) + (b.engagement.comments || 0) + (b.engagement.shares || 0) + (b.engagement.reposts || 0);
+          return engB - engA;
+        });
+        break;
+    }
+    
+    setFilteredMenciones(result);
+  };
+
+  // Manejar cambios en filtros
+  const handleNetworkFilter = (network: string) => {
+    if (selectedNetworks.includes(network)) {
+      setSelectedNetworks(selectedNetworks.filter(n => n !== network));
+    } else {
+      setSelectedNetworks([...selectedNetworks, network]);
+    }
+  };
+
+  const handleSentimentFilter = (sentiment: string) => {
+    if (selectedSentiment.includes(sentiment)) {
+      setSelectedSentiment(selectedSentiment.filter(s => s !== sentiment));
+    } else {
+      setSelectedSentiment([...selectedSentiment, sentiment]);
+    }
+  };
+
+  // Aplicar filtros cuando cambian
+  React.useEffect(() => {
+    filterMenciones();
+  }, [searchQuery, selectedNetworks, selectedSentiment, sortBy]);
+
+  return (
+    <div className="py-6 px-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Menciones</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Monitoreo de referencias a tu marca en <strong>Reputación Online</strong></p>
+        </div>
+        
+        <div className="flex items-center gap-4 mt-4 md:mt-0">
+          <button
+            onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
+            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            {viewMode === 'list' ? <FaTh /> : <FaListAlt />}
+          </button>
+
+          <div className="relative">
+            <button 
+              onClick={() => document.getElementById('filterDropdown')?.classList.toggle('hidden')}
+              className="flex items-center space-x-1 py-2 px-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none"
+            >
+              <FaFilter />
+              <span>Filtros</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Filtros y búsqueda */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <div className="flex-1 relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FaSearch className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="Buscar menciones, autores, hashtags..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex space-x-2">
+            <button 
+              className={`px-3 py-2 rounded-md flex items-center ${selectedNetworks.length > 0 || selectedSentiment.length > 0 ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}
+              onClick={() => document.getElementById('filterModal')?.classList.remove('hidden')}
+            >
+              <FaFilter className="mr-2" />
+              Filtros {(selectedNetworks.length > 0 || selectedSentiment.length > 0) && `(${selectedNetworks.length + selectedSentiment.length})`}
+            </button>
+            
+            <div className="border-r border-gray-300 dark:border-gray-600"></div>
+            
+            <button 
+              className={`px-3 py-2 rounded-md ${sortBy === 'recientes' ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}
+              onClick={() => setSortBy('recientes')}
+            >
+              Recientes
+            </button>
+            
+            <button 
+              className={`px-3 py-2 rounded-md ${sortBy === 'relevantes' ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}
+              onClick={() => setSortBy('relevantes')}
+            >
+              Relevantes
+            </button>
+            
+            <button 
+              className={`px-3 py-2 rounded-md ${sortBy === 'engagement' ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}
+              onClick={() => setSortBy('engagement')}
+            >
+              Engagement
+            </button>
+            
+            <div className="border-r border-gray-300 dark:border-gray-600"></div>
+            
+            <button 
+              className={`p-2 rounded-md ${viewMode === 'list' ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}
+              onClick={() => setViewMode('list')}
+              title="Vista de lista"
+            >
+              <FaListAlt />
+            </button>
+            
+            <button 
+              className={`p-2 rounded-md ${viewMode === 'grid' ? 'bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}
+              onClick={() => setViewMode('grid')}
+              title="Vista de cuadrícula"
+            >
+              <FaTh />
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Lista de menciones */}
+      {filteredMenciones.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+          <p className="text-gray-600 dark:text-gray-400">No se encontraron menciones con los filtros seleccionados.</p>
+        </div>
+      ) : (
+        <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}>
+          {filteredMenciones.map(mencion => (
+            <MencionItem key={mencion.id} {...mencion} />
+          ))}
+        </div>
+      )}
+      
+      {/* Modal de filtros (normalmente estaría oculto) */}
+      <div id="filterModal" className="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Filtros</h3>
+            <button 
+              className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+              onClick={() => document.getElementById('filterModal')?.classList.add('hidden')}
+            >
+              ×
+            </button>
+          </div>
+          
+          <div className="mb-6">
+            <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">Redes sociales</h4>
+            <div className="flex flex-wrap gap-2">
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedNetworks.includes('x') ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleNetworkFilter('x')}
+              >
+                X
+              </button>
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedNetworks.includes('facebook') ? 'bg-[#1877F2] text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleNetworkFilter('facebook')}
+              >
+                Facebook
+              </button>
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedNetworks.includes('instagram') ? 'bg-[#E1306C] text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleNetworkFilter('instagram')}
+              >
+                Instagram
+              </button>
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedNetworks.includes('linkedin') ? 'bg-[#0077B5] text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleNetworkFilter('linkedin')}
+              >
+                LinkedIn
+              </button>
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedNetworks.includes('tiktok') ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleNetworkFilter('tiktok')}
+              >
+                TikTok
+              </button>
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedNetworks.includes('news') ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleNetworkFilter('news')}
+              >
+                Noticias
+              </button>
+            </div>
+          </div>
+          
+          <div className="mb-6">
+            <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">Sentimiento</h4>
+            <div className="flex flex-wrap gap-2">
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedSentiment.includes('positivo') ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleSentimentFilter('positivo')}
+              >
+                Positivo
+              </button>
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedSentiment.includes('neutral') ? 'bg-gray-500 text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleSentimentFilter('neutral')}
+              >
+                Neutral
+              </button>
+              <button 
+                className={`px-3 py-1 rounded-full ${selectedSentiment.includes('negativo') ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                onClick={() => handleSentimentFilter('negativo')}
+              >
+                Negativo
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-3">
+            <button 
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              onClick={() => {
+                setSelectedNetworks([]);
+                setSelectedSentiment([]);
+                document.getElementById('filterModal')?.classList.add('hidden');
+              }}
+            >
+              Limpiar filtros
+            </button>
+            <button 
+              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 dark:hover:bg-primary-500"
+              onClick={() => document.getElementById('filterModal')?.classList.add('hidden')}
+            >
+              Aplicar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

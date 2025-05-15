@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id                Int                @id @default(autoincrement())
+  email             String             @unique
+  password          String
+  nombre            String
+  rol               String             @default("usuario")
+  plan              String             @default("free")
+  creditosDisponibles Int              @default(0)
+  creditosGastados  Int                @default(0)
+  ultimaActividad   DateTime?         
+  estado            String             @default("activo") // activo, advertencia, sin_creditos
+  creditos          Credito[]
+  monitoreos        Monitoreo[]
+  menciones         Mencion[]
+  alertas           Alerta[]
+  reportes          Reporte[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+model Credito {
+  id          Int       @id @default(autoincrement())
+  usuarioId   Int
+  tipo        String    // consumo, recarga
+  cantidad    Int
+  descripcion String?
+  canal       String?   // X, Facebook, Instagram, LinkedIn, TikTok, Búsqueda
+  createdAt   DateTime  @default(now())
+
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+}
+
+model Monitoreo {
+  id          Int       @id @default(autoincrement())
+  usuarioId   Int
+  nombre      String
+  tipo        String    // red_social, web, noticias
+  canal       String?   // X, Facebook, Instagram, LinkedIn, TikTok
+  palabrasClave String  // Almacenadas como JSON
+  frecuencia  String    // diario, semanal, mensual, tiempo_real
+  activo      Boolean   @default(true)
+  menciones   Mencion[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+}
+
+model Mencion {
+  id          Int       @id @default(autoincrement())
+  monitoreoId Int
+  usuarioId   Int
+  contenido   String
+  url         String
+  autor       String?
+  canal       String
+  sentimiento String?   // positivo, negativo, neutral
+  impacto     Int?      // 1-10
+  fecha       DateTime  @default(now())
+  procesado   Boolean   @default(false)
+
+  monitoreo   Monitoreo @relation(fields: [monitoreoId], references: [id])
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+}
+
+model Alerta {
+  id          Int       @id @default(autoincrement())
+  usuarioId   Int
+  titulo      String
+  descripcion String
+  tipo        String    // critica, mencion_negativa, viral, oportunidad
+  leida       Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+}
+
+model Reporte {
+  id          Int       @id @default(autoincrement())
+  usuarioId   Int
+  titulo      String
+  periodo     String    // diario, semanal, mensual, personalizado
+  contenido   String    // JSON con datos del reporte
+  createdAt   DateTime  @default(now())
+  fechaInicio DateTime
+  fechaFin    DateTime
+
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+}
+
+model Plan {
+  id               Int      @id @default(autoincrement())
+  nombre           String
+  creditos         Int
+  precio           Int
+  caracteristicas  String   // JSON con lista de características
+  destacado        Boolean  @default(false)
+  activo           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+}
