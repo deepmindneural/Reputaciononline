@@ -5,6 +5,8 @@ const nextConfig = {
   experimental: {
     appDir: true, // Habilita el directorio app (necesario para Next.js 13.0.7)
   },
+  // Optimizaciones para producción
+  productionBrowserSourceMaps: false,
   images: {
     domains: ['randomuser.me', 'images.unsplash.com'],
     unoptimized: true
