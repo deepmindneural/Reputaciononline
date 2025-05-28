@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
         userId: session.user.id,
         amount: plan.creditos,
         type: 'purchase',
-        description: `Compra de ${plan.nombre}${plan.ciclo ? ` (${plan.ciclo})` : ''}`,
+        description: `Compra de ${plan.nombre}${('ciclo' in plan) ? ` (${plan.ciclo})` : ''}`,
         paymentMethod: metodoPago || 'credit_card',
         paymentReference: `ref_${Date.now()}`,
         status: 'completed',
