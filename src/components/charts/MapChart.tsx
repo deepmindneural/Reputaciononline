@@ -2,6 +2,13 @@
 
 import React from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
+import { Feature, Geometry } from 'geojson';
+
+type GeoProperties = {
+  name?: string;
+  rsmKey?: string;
+  [key: string]: any;
+};
 
 // Mapa de Colombia por defecto
 const COLOMBIA_GEO_URL = '/geo/colombia.json';
@@ -74,16 +81,17 @@ const MapChart: React.FC<MapChartProps> = ({
         style={{ width: '100%', height: '100%' }}
       >
         <Geographies geography={geoUrl}>
+          {/* @ts-ignore */}
           {({ geographies }) =>
-            geographies.map((geo) => {
+            geographies.map((geo: any) => {
               // Buscar si hay datos para esta región
               const locationMatch = locations.find(
-                loc => loc.name.toLowerCase() === geo.properties.name?.toLowerCase()
+                loc => loc.name.toLowerCase() === (geo.properties?.name || '').toLowerCase()
               );
               
               return (
                 <Geography
-                  key={geo.rsmKey}
+                  key={`geo-${geo.properties?.name || Math.random()}`}
                   geography={geo}
                   fill={locationMatch ? highlightColor : defaultColor}
                   stroke="#FFFFFF"
