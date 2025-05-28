@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Crear la agencia y el usuario en una transacciu00f3n
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: PrismaClient) => {
       try {
         // 1. Crear el perfil de agencia
         console.log('Creando perfil de agencia...');
