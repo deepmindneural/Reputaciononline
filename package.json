@@ -8,7 +8,7 @@
     "build": "echo \"Building main app only\" && next build",
     "build:admin": "cd admin-modern && npm install && npm run build",
     "build:all": "npm run build && npm run build:admin",
-    "build:docker": "NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 next build --no-lint",
+    "build:docker": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -39,7 +39,7 @@
     "cmdk": "^1.1.1",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.511.0",
-    "next": "^13.4.19",
+    "next": "13.4.19",
     "next-auth": "^4.24.5",
     "next-themes": "^0.4.6",
     "postcss": "^8.4.31",
