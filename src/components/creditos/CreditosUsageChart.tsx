@@ -6,6 +6,9 @@ interface ChartData {
   label: string;
   valor: number;
   color: string;
+  porcentaje?: number;
+  anguloInicio?: number;
+  anguloFin?: number;
 }
 
 export default function CreditosUsageChart() {
@@ -178,7 +181,7 @@ export default function CreditosUsageChart() {
                   style={{ backgroundColor: item.color }}
                 />
                 <span className="text-xs capitalize text-gray-600 dark:text-gray-300">
-                  {item.label} ({item.porcentaje > 0 ? item.porcentaje.toFixed(1) : 0}%)
+                  {item.label} ({item.porcentaje && item.porcentaje > 0 ? item.porcentaje.toFixed(1) : 0}%)
                 </span>
               </div>
             ))}
