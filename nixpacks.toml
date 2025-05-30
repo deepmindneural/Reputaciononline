@@ -1,0 +1,11 @@
+[phases.setup]
+packageManager = "npm"
+
+[phases.install]
+command = "npm install --omit=dev"
+
+[phases.build]
+command = "npm run build:docker"
+
+[start]
+command = "npm run start"
