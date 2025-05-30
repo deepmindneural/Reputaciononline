@@ -8,6 +8,7 @@
     "build": "echo \"Building main app only\" && next build",
     "build:admin": "cd admin-modern && npm install && npm run build",
     "build:all": "npm run build && npm run build:admin",
+    "build:docker": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "echo \"Error: no test specified\" && exit 1"
