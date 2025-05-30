@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import { Users, CreditCard, Package, TrendingUp } from "lucide-react";
-import { formatearCantidad } from "@/lib/utils";
-import { EstadisticaCard } from "@/components/estadistica-card";
-import { GraficoUsoCreditos } from "@/components/grafico-uso-creditos";
-import { TransaccionesRecientes } from "@/components/transacciones-recientes";
+import { formatearCantidad } from "../../../lib/utils";
+import { EstadisticaCard } from "../../../components/estadistica-card";
+import { GraficoUsoCreditos } from "../../../components/grafico-uso-creditos";
+import { TransaccionesRecientes } from "../../../components/transacciones-recientes";
 
 export const metadata: Metadata = {
   title: "Dashboard | Reputación Online",

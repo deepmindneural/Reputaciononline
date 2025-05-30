@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { cn } from "../lib/utils";
 
 interface EstadisticaCardProps {
   title: string;

@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Search, Package, Star, Check, MoreHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { formatearCantidad, formatearFecha } from "@/lib/utils";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Badge } from "../../../components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../../../components/ui/card";
+import { Separator } from "../../../components/ui/separator";
+import { formatearCantidad, formatearFecha } from "../../../lib/utils";
 
 interface Plan {
   id: string;
