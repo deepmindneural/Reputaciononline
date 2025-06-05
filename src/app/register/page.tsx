@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Eye, EyeOff, Mail, Lock, User, Check, Building } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Check, Building, UserCheck, UserCog } from 'lucide-react';
+import gsap from 'gsap';
+import { fadeInUp, staggerFadeIn, createTimeline } from '../../lib/gsap-animations';
+import { aiPatternLearning, aiDataAnalysis, aiDecisionMaking, aiAdaptiveInterface } from '../../lib/ai-animations';
+import AnimatedBackground from '../../components/ui/AnimatedBackground';
 
 export default function RegisterPage() {
   // Estados para manejar la entrada de usuario
@@ -18,6 +21,13 @@ export default function RegisterPage() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
   const [paso, setPaso] = useState(1); // Para el proceso de registro en 2 pasos
+  const [tipoPerfil, setTipoPerfil] = useState<'personal'|'political'>('personal'); // Tipo de perfil: personal o político
+  
+  // Referencias para animaciones
+  const titleRef = useRef<HTMLDivElement>(null);
+  const subtitleRef = useRef<HTMLHeadingElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
 
   // Función para validar el correo electrónico
   const esEmailValido = (email: string) => {
@@ -30,12 +40,102 @@ export default function RegisterPage() {
     return password.length >= 8; // Criterio mínimo
   };
 
+  // Inicializar animaciones
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const tl = createTimeline({ defaults: { ease: 'power3.out' } });
+    
+    // Animar título y logo con efecto "inteligente"
+    if (titleRef.current) {
+      tl.from(titleRef.current, {
+        opacity: 0, 
+        y: -20, 
+        duration: 0.6,
+        clearProps: 'all'
+      });
+    }
+    
+    // Animar subtítulo con efecto de aparición gradual
+    if (subtitleRef.current) {
+      tl.from(subtitleRef.current, {
+        opacity: 0, 
+        filter: 'blur(5px)',
+        duration: 0.7,
+        clearProps: 'all'
+      }, '-=0.3');
+    }
+    
+    // Animar características con un efecto de análisis de datos de IA
+    if (featuresRef.current && featuresRef.current.children.length > 0) {
+      const features = Array.from(featuresRef.current.children);
+      aiDataAnalysis(features, {
+        delay: 0.2
+      });
+    }
+    
+    // Animar formulario con efecto de interfaz adaptativa
+    if (formRef.current) {
+      // Referencias para los diferentes pasos del formulario
+      const formStep1Elements = paso === 1 ? formRef.current.querySelectorAll('input, button, label') : formRef.current.querySelectorAll('input:disabled');
+      const formStep2Elements = paso === 2 ? formRef.current.querySelectorAll('input:not([disabled]), button:not([disabled])') : formRef.current.querySelectorAll('input:disabled');
+      
+      // En lugar de usar la animación de IA adaptativa compleja, usar una animación básica primero
+      tl.from(formRef.current, {
+        opacity: 0,
+        y: 15,
+        duration: 0.4,
+        clearProps: 'all'
+      });
+      
+      // Asegurar que los campos del paso actual sean visibles inmediatamente
+      if (paso === 1) {
+        gsap.set(formStep1Elements, { opacity: 1, clearProps: "transform" });
+      } else if (paso === 2) {
+        gsap.set(formStep2Elements, { opacity: 1, clearProps: "transform" });
+      }
+      
+      // Cuando cambie de paso, simular IA tomando decisiones
+      const handleStepChange = () => {
+        if (!formRef.current) return;
+        
+        const options = Array.from(formRef.current.querySelectorAll('.step-option'));
+        const selectedOption = formRef.current.querySelector('.selected-step');
+        
+        if (options.length && selectedOption) {
+          aiDecisionMaking(options, selectedOption, { delay: 0.2 });
+        }
+      };
+      
+      // Agregar el manejador para simular la toma de decisiones IA al cambiar pasos
+      const stepButtons = formRef.current.querySelectorAll('.step-button');
+      stepButtons.forEach(button => {
+        button.addEventListener('click', handleStepChange);
+      });
+      
+      return () => {
+        if (!formRef.current) return;
+        
+        // Limpiar event listeners
+        const updatedStepButtons = formRef.current.querySelectorAll('.step-button');
+        updatedStepButtons.forEach(button => {
+          button.removeEventListener('click', handleStepChange);
+        });
+        tl.kill();
+      };
+    }
+    
+    return () => {
+      tl.kill();
+    };
+  }, [paso]);  // Agregamos 'paso' como dependencia para que las animaciones se actualicen al cambiar el paso
+
   // Función para manejar el envío del formulario del primer paso
   const handlePaso1 = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validación básica
-    if (!nombre || !email || !password || !confirmarPassword) {
+    if (!nombre || !email || !password || !confirmarPassword || !tipoPerfil) {
       setError('Por favor completa todos los campos obligatorios');
       return;
     }
@@ -75,17 +175,98 @@ export default function RegisterPage() {
       return;
     }
     
-    // Simulación de registro
+    // Registro con IndexedDB
     try {
       setCargando(true);
       setError('');
       
-      // Simulación de un proceso de registro
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Importar el servicio de DB bajo demanda (para evitar errores de SSR)
+      const { getUserByEmail, addUserWithCredentials } = await import('@/services/dbService');
       
-      // Redirección a dashboard (en producción se haría después de registrar)
+      // Verificar que el correo no exista ya
+      const existingUser = await getUserByEmail(email);
+      if (existingUser) {
+        setError('Este correo electrónico ya está registrado. Prueba con otro o inicia sesión.');
+        setCargando(false);
+        return;
+      }
+      
+      // Crear un nuevo usuario
+      const newUserId = `user_${Date.now()}`;
+      const currentDate = new Date().toISOString();
+      
+      // Datos del usuario
+      const userData = {
+        id: newUserId,
+        name: nombre,
+        email: email,
+        profileType: tipoPerfil,
+        avatarUrl: `https://randomuser.me/api/portraits/${tipoPerfil === 'political' ? 'men' : 'women'}/${Math.floor(Math.random() * 70)}.jpg`,
+        role: 'user' as 'user' | 'admin',
+        createdAt: currentDate,
+        lastLogin: currentDate,
+        plan: 'basic' as 'free' | 'basic' | 'pro' | 'enterprise',
+        credits: 500, // Créditos iniciales de bienvenida
+        nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días desde hoy
+        socialMedia: [
+          {
+            platform: 'twitter' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            username: '',
+            followers: 0,
+            connected: false,
+            profileUrl: ''
+          },
+          {
+            platform: 'facebook' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            username: '',
+            followers: 0,
+            connected: false,
+            profileUrl: ''
+          },
+          {
+            platform: 'instagram' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            username: '',
+            followers: 0,
+            connected: false,
+            profileUrl: ''
+          },
+          {
+            platform: 'linkedin' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            username: '',
+            followers: 0,
+            connected: false,
+            profileUrl: ''
+          },
+          {
+            platform: 'tiktok' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            username: '',
+            followers: 0,
+            connected: false,
+            profileUrl: ''
+          }
+        ],
+        reputation: {
+          score: 50,
+          previousScore: 50,
+          trend: 'stable' as 'up' | 'down' | 'stable',
+          positiveMentions: 0,
+          neutralMentions: 0,
+          negativeMentions: 0,
+          totalMentions: 0,
+          recentMentions: []
+        }
+      };
+      
+      // Registrar usuario en la BD
+      const user = await addUserWithCredentials(userData, password);
+      
+      // Guardar usuario en localStorage para mantener la sesión
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      
+      // Redirección a dashboard
       window.location.href = '/dashboard';
     } catch (err) {
+      console.error('Error de registro:', err);
       setError('Error al registrar tu cuenta. Por favor intenta nuevamente.');
     } finally {
       setCargando(false);
@@ -96,31 +277,29 @@ export default function RegisterPage() {
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Panel lateral - Solo visible en pantallas medianas y grandes */}
       <div className="relative hidden w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 md:block">
+        <AnimatedBackground 
+          className="opacity-40" 
+          particleColor="rgba(255, 255, 255, 0.6)" 
+        />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-white">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <div
+            ref={titleRef}
             className="mb-8 flex items-center"
           >
             <div className="mr-3 h-12 w-12 rounded-full bg-white bg-opacity-20"></div>
             <h1 className="text-3xl font-bold">Reputación Online</h1>
-          </motion.div>
+          </div>
           
-          <motion.h2 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+          <h2 
+            ref={subtitleRef}
             className="mb-6 text-center text-2xl font-light"
           >
-            Únete hoy y comienza a gestionar tu presencia digital como un profesional
-          </motion.h2>
+            Crea tu cuenta y descubre el poder de la gestión de reputación profesional
+          </h2>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="space-y-6"
+          <div
+            ref={featuresRef}
+            className="mt-4 space-y-4"
           >
             <div className="rounded-lg bg-white bg-opacity-10 p-4">
               <div className="mb-2 flex items-center">
@@ -138,7 +317,7 @@ export default function RegisterPage() {
             <p className="text-center text-sm">
               Al registrarte, recibirás créditos de bienvenida para que puedas comenzar a utilizar nuestra plataforma inmediatamente.
             </p>
-          </motion.div>
+          </div>
         </div>
         
         <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-white text-opacity-70">
@@ -148,10 +327,8 @@ export default function RegisterPage() {
       
       {/* Formulario de registro */}
       <div className="flex w-full items-center justify-center px-4 md:w-1/2 md:px-0">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+        <div 
+          ref={formRef}
           className="w-full max-w-md space-y-8 p-8"
         >
           {/* Logo solo visible en móviles */}
@@ -166,7 +343,7 @@ export default function RegisterPage() {
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Crear una cuenta</h2>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              {paso === 1 ? 'Comienza con tus datos personales' : 'Un paso más para completar tu registro'}
+              {paso === 1 ? 'Comienza con tus datos personales' : `Un paso más para completar tu registro de ${tipoPerfil === 'political' ? 'perfil político' : 'persona natural'}`}
             </p>
           </div>
           
@@ -198,7 +375,39 @@ export default function RegisterPage() {
           {paso === 1 ? (
             <form className="mt-8 space-y-6" onSubmit={handlePaso1}>
               <div className="space-y-4">
-                <div>
+                {/* Selector de tipo de perfil */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Tipo de perfil <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div 
+                    onClick={() => setTipoPerfil('personal')}
+                    className={`cursor-pointer rounded-lg border-2 ${tipoPerfil === 'personal' 
+                      ? 'border-primary bg-primary-50 dark:bg-primary-900/20 dark:border-primary-600' 
+                      : 'border-gray-200 dark:border-gray-700'} 
+                      p-4 flex flex-col items-center justify-center transition-colors`}
+                  >
+                    <UserCheck className={`h-8 w-8 mb-2 ${tipoPerfil === 'personal' ? 'text-primary' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${tipoPerfil === 'personal' ? 'text-primary dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'}`}>Persona Natural</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">Individuos y profesionales</p>
+                  </div>
+                  
+                  <div 
+                    onClick={() => setTipoPerfil('political')}
+                    className={`cursor-pointer rounded-lg border-2 ${tipoPerfil === 'political' 
+                      ? 'border-primary bg-primary-50 dark:bg-primary-900/20 dark:border-primary-600' 
+                      : 'border-gray-200 dark:border-gray-700'} 
+                      p-4 flex flex-col items-center justify-center transition-colors`}
+                  >
+                    <UserCog className={`h-8 w-8 mb-2 ${tipoPerfil === 'political' ? 'text-primary' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${tipoPerfil === 'political' ? 'text-primary dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'}`}>Político</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">Candidatos y figuras políticas</p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
                   <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nombre completo <span className="text-red-500">*</span>
                   </label>
@@ -312,9 +521,10 @@ export default function RegisterPage() {
               <div>
                 <button
                   type="submit"
-                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-primary-600 py-3 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-primary-700 dark:hover:bg-primary-600"
+                  className="step-button step-option flex w-full items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-center text-base font-medium text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  disabled={cargando}
                 >
-                  Continuar
+                  {cargando ? 'Procesando...' : 'Continuar'}
                 </button>
               </div>
             </form>
@@ -323,23 +533,21 @@ export default function RegisterPage() {
               <div className="space-y-4">
                 <div>
                   <label htmlFor="empresa" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Nombre de la empresa <span className="text-red-500">*</span>
-                  </label>
+                  {tipoPerfil === 'political' ? 'Partido político o movimiento' : 'Nombre de empresa o marca'} <span className="text-red-500">*</span>
+                </label>
                   <div className="relative mt-1">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <Building className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="empresa"
-                      name="empresa"
-                      type="text"
-                      autoComplete="organization"
-                      required
-                      value={empresa}
-                      onChange={(e) => setEmpresa(e.target.value)}
-                      className="block w-full rounded-md border-gray-300 py-3 pl-10 placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                      placeholder="Nombre de tu empresa"
-                    />
+                  <Building className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="empresa"
+                  name="empresa"
+                  type="text"
+                  value={empresa}
+                  onChange={(e) => setEmpresa(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 pl-10 text-gray-900 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-600 dark:focus:ring-primary-500 sm:text-sm"
+                  placeholder={tipoPerfil === 'political' ? 'Nombre del partido político o movimiento' : 'Nombre de tu empresa o marca'}
+                />
                   </div>
                 </div>
                 
@@ -386,11 +594,11 @@ export default function RegisterPage() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
+              <div className="mt-4 flex justify-between space-x-4">
+                <button 
+                  type="button" 
                   onClick={() => setPaso(1)}
-                  className="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
+                  className="step-button step-option flex w-full items-center justify-center rounded-lg bg-gray-200 px-5 py-3 text-center text-base font-medium text-gray-700 hover:bg-gray-300 focus:ring-4 focus:ring-gray-100 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:focus:ring-gray-600"
                 >
                   Volver
                 </button>
@@ -398,7 +606,7 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={cargando}
-                  className="group relative flex justify-center rounded-md border border-transparent bg-primary-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-75 dark:bg-primary-700 dark:hover:bg-primary-600"
+                  className="step-button step-option flex w-full items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-center text-base font-medium text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-75"
                 >
                   {cargando ? (
                     <span className="flex items-center">
@@ -424,7 +632,7 @@ export default function RegisterPage() {
               </Link>
             </p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

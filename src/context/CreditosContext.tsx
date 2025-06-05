@@ -1,277 +1,281 @@
+"use client";
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { gsap } from 'gsap';
 
-// Tipos para transacciones y créditos
-type TipoTransaccion = 'asignacion' | 'consumo' | 'compra' | 'expiracion';
-type Canal = 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'tiktok' | 'general';
-
-export interface Transaccion {
+export interface HistorialTransaccion {
   id: string;
-  usuarioId: string;
-  tipo: TipoTransaccion;
-  cantidad: number;
+  fecha: string;
+  monto: number;
   descripcion: string;
-  canal?: Canal;
-  fecha: Date;
-  planId?: string;
-}
-
-export interface EstadoCreditos {
-  disponibles: number;
-  gastados: number;
-  historial: Transaccion[];
-  umbralAlerta: number;
-  proximaExpiracion?: Date;
-  planActual?: string;
+  tipo: 'ingreso' | 'egreso';
+  canal?: string;
 }
 
 interface CreditosContextType {
-  creditos: EstadoCreditos;
-  cargandoCreditos: boolean;
-  error: string | null;
-  cargarCreditosUsuario: (usuarioId: string) => Promise<void>;
-  asignarCreditos: (usuarioId: string, cantidad: number, descripcion: string) => Promise<boolean>;
-  consumirCreditos: (cantidad: number, descripcion: string, canal: Canal) => Promise<boolean>;
-  comprarCreditos: (planId: string, cantidad: number, monto: number) => Promise<boolean>;
-  verificarCreditosSuficientes: (cantidad: number) => boolean;
-  actualizarUmbralAlerta: (umbral: number) => void;
+  saldo: number;
+  historial: HistorialTransaccion[];
+  comprarCreditos: (monto: number) => void;
+  usarCreditos: (monto: number, descripcion: string) => void;
+  isLoading: boolean;
+  // Propiedades adicionales necesarias para componentes
+  disponibles: number;
+  gastados: number;
+  umbralAlerta: number;
+  totalAsignado: number;
 }
 
-const CreditosContext = createContext<CreditosContextType | null>(null);
+const CreditosContext = createContext<CreditosContextType | undefined>(undefined);
 
-export function useCreditosContext() {
-  const context = useContext(CreditosContext);
-  if (!context) {
-    throw new Error('useCreditosContext debe usarse dentro de un CreditosProvider');
-  }
-  return context;
-}
+export const CreditosProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [saldo, setSaldo] = useState<number>(2500);
+  const [historial, setHistorial] = useState<HistorialTransaccion[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  // Estados adicionales necesarios para componentes existentes
+  const [gastados, setGastados] = useState<number>(250); // Valor inicial para demo
 
-interface CreditosProviderProps {
-  children: ReactNode;
-}
+  // Simulación de carga de datos inicial
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        // Simular llamada a API
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Datos simulados para el usuario
+        const historialInicial: HistorialTransaccion[] = [
+          {
+            id: 'tx-001',
+            fecha: '2025-06-03T15:30:00',
+            monto: 500,
+            descripcion: 'Compra de créditos',
+            tipo: 'ingreso',
+            canal: 'general'
+          },
+          {
+            id: 'tx-002',
+            fecha: '2025-06-01T10:12:00',
+            monto: 250,
+            descripcion: 'Uso en campaña de Twitter',
+            tipo: 'egreso',
+            canal: 'twitter'
+          },
+          {
+            id: 'tx-003',
+            fecha: '2025-05-28T14:45:00',
+            monto: 1000,
+            descripcion: 'Créditos de bienvenida',
+            tipo: 'ingreso',
+            canal: 'general'
+          },
+          {
+            id: 'tx-004',
+            fecha: '2025-05-25T09:30:00',
+            monto: 1500,
+            descripcion: 'Compra de créditos',
+            tipo: 'ingreso',
+            canal: 'general'
+          },
+          {
+            id: 'tx-005',
+            fecha: '2025-05-20T11:15:00',
+            monto: 150,
+            descripcion: 'Análisis de reputación en Facebook',
+            tipo: 'egreso',
+            canal: 'facebook'
+          },
+          {
+            id: 'tx-006',
+            fecha: '2025-05-15T16:30:00',
+            monto: 100,
+            descripcion: 'Monitoreo avanzado de Instagram',
+            tipo: 'egreso',
+            canal: 'instagram'
+          },
+          {
+            id: 'tx-007',
+            fecha: '2025-05-10T13:20:00',
+            monto: 75,
+            descripcion: 'Análisis de LinkedIn',
+            tipo: 'egreso',
+            canal: 'linkedin'
+          },
+          {
+            id: 'tx-008',
+            fecha: '2025-05-05T08:45:00',
+            monto: 50,
+            descripcion: 'Monitoreo de TikTok',
+            tipo: 'egreso',
+            canal: 'tiktok'
+          }
+        ];
+        
+        // Calcular el saldo actual basado en el historial
+        const saldoCalculado = historialInicial.reduce((acc, tx) => {
+          return tx.tipo === 'ingreso' ? acc + tx.monto : acc - tx.monto;
+        }, 0);
+        
+        setSaldo(saldoCalculado);
+        setHistorial(historialInicial);
+        setGastados(historialInicial
+          .filter(tx => tx.tipo === 'egreso')
+          .reduce((sum, tx) => sum + tx.monto, 0));
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error cargando datos de créditos:", error);
+        setIsLoading(false);
+      }
+    };
 
-export function CreditosProvider({ children }: CreditosProviderProps) {
-  const [creditos, setCreditos] = useState<EstadoCreditos>({
-    disponibles: 0,
-    gastados: 0,
-    historial: [],
-    umbralAlerta: 20, // Porcentaje por defecto para alertas
-  });
-  const [cargandoCreditos, setCargandoCreditos] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    cargarDatos();
+  }, []);
 
-  // Cargar créditos para un usuario específico
-  const cargarCreditosUsuario = async (usuarioId: string) => {
-    setCargandoCreditos(true);
-    setError(null);
-    try {
-      // Aquí se realizaría la petición a la API para cargar los créditos del usuario
-      // Por ahora, simularemos datos
-      const mockHistorial: Transaccion[] = [
-        {
-          id: '1',
-          usuarioId,
-          tipo: 'asignacion',
-          cantidad: 1000,
-          descripcion: 'Plan inicial',
-          fecha: new Date(2025, 4, 25),
-          planId: 'plan-basico'
+  const comprarCreditos = (monto: number) => {
+    if (monto <= 0) return;
+    
+    const nuevaTransaccion: HistorialTransaccion = {
+      id: `tx-${Date.now()}`,
+      fecha: new Date().toISOString(),
+      monto,
+      descripcion: 'Compra de créditos',
+      tipo: 'ingreso'
+    };
+    
+    // Actualizar saldo con animación
+    const elementoSaldo = document.getElementById('saldo-creditos');
+    if (elementoSaldo) {
+      const saldoOriginal = saldo;
+      const saldoNuevo = saldo + monto;
+      
+      gsap.to({}, {
+        duration: 1,
+        onUpdate: function() {
+          const progress = this.progress();
+          const valorActual = saldoOriginal + Math.round(progress * monto);
+          elementoSaldo.textContent = valorActual.toLocaleString();
         },
-        {
-          id: '2',
-          usuarioId,
-          tipo: 'consumo',
-          cantidad: 50,
-          descripcion: 'Análisis de sentimiento',
-          canal: 'twitter',
-          fecha: new Date(2025, 4, 26)
-        },
-        {
-          id: '3',
-          usuarioId,
-          tipo: 'consumo',
-          cantidad: 30,
-          descripcion: 'Monitoreo de menciones',
-          canal: 'instagram',
-          fecha: new Date(2025, 4, 27)
-        },
-        {
-          id: '4',
-          usuarioId,
-          tipo: 'compra',
-          cantidad: 500,
-          descripcion: 'Recarga créditos',
-          fecha: new Date(2025, 4, 28),
-          planId: 'plan-recarga'
+        onComplete: function() {
+          elementoSaldo.textContent = saldoNuevo.toLocaleString();
         }
-      ];
-
-      // Calcular disponibles y gastados basado en el historial
-      const disponibles = mockHistorial.reduce((total, t) => {
-        if (t.tipo === 'asignacion' || t.tipo === 'compra') {
-          return total + t.cantidad;
-        } else if (t.tipo === 'consumo' || t.tipo === 'expiracion') {
-          return total - t.cantidad;
+      });
+    }
+    
+    setSaldo(prevSaldo => prevSaldo + monto);
+    setHistorial(prevHistorial => [nuevaTransaccion, ...prevHistorial]);
+    
+    // Mostrar notificación visual
+    const notificacion = document.createElement('div');
+    notificacion.className = 'fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md z-50';
+    notificacion.innerHTML = `
+      <div class="flex">
+        <div class="py-1">
+          <svg class="h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="font-bold">Créditos añadidos</p>
+          <p>Se han añadido ${monto} créditos a tu cuenta.</p>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(notificacion);
+    
+    gsap.fromTo(notificacion, 
+      { y: -50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+    );
+    
+    setTimeout(() => {
+      gsap.to(notificacion, {
+        y: -50,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          notificacion.remove();
         }
-        return total;
-      }, 0);
+      });
+    }, 3000);
+  };
 
-      const gastados = mockHistorial
-        .filter(t => t.tipo === 'consumo')
-        .reduce((total, t) => total + t.cantidad, 0);
+  const usarCreditos = (monto: number, descripcion: string) => {
+    if (monto <= 0 || monto > saldo) return;
+    
+    const nuevaTransaccion: HistorialTransaccion = {
+      id: `tx-${Date.now()}`,
+      fecha: new Date().toISOString(),
+      monto,
+      descripcion,
+      tipo: 'egreso'
+    };
+    
+    // Actualizar saldo con animación
+    const elementoSaldo = document.getElementById('saldo-creditos');
+    if (elementoSaldo) {
+      const saldoOriginal = saldo;
+      const saldoNuevo = saldo - monto;
+      
+      gsap.to({}, {
+        duration: 1,
+        onUpdate: function() {
+          const progress = this.progress();
+          const valorActual = saldoOriginal - Math.round(progress * monto);
+          elementoSaldo.textContent = valorActual.toLocaleString();
+        },
+        onComplete: function() {
+          elementoSaldo.textContent = saldoNuevo.toLocaleString();
+        }
+      });
+    }
+    
+    setSaldo(prevSaldo => prevSaldo - monto);
+    setHistorial(prevHistorial => [nuevaTransaccion, ...prevHistorial]);
+  };
 
-      setCreditos({
+  // Calcular valores adicionales
+  const disponibles = saldo;
+  const totalAsignado = saldo + gastados;
+  const umbralAlerta = 20; // Porcentaje de alerta cuando los créditos bajan de este nivel
+
+  // Actualizar gastados cuando se usa créditos
+  useEffect(() => {
+    // Calcular gastados basado en el historial de egresos
+    const totalGastado = historial
+      .filter(tx => tx.tipo === 'egreso')
+      .reduce((sum, tx) => sum + tx.monto, 0);
+    
+    setGastados(totalGastado);
+  }, [historial]);
+
+  return (
+    <CreditosContext.Provider
+      value={{
+        saldo,
+        historial,
+        comprarCreditos,
+        usarCreditos,
+        isLoading,
         disponibles,
         gastados,
-        historial: mockHistorial,
-        umbralAlerta: creditos.umbralAlerta,
-        proximaExpiracion: new Date(2025, 8, 25), // 4 meses después
-        planActual: 'Plan Básico'
-      });
-    } catch (e) {
-      setError('Error al cargar los créditos');
-      console.error(e);
-    } finally {
-      setCargandoCreditos(false);
-    }
-  };
+        umbralAlerta,
+        totalAsignado
+      }}
+    >
+      {children}
+    </CreditosContext.Provider>
+  );
+};
 
-  // Asignar créditos a un usuario (solo admin)
-  const asignarCreditos = async (usuarioId: string, cantidad: number, descripcion: string): Promise<boolean> => {
-    setCargandoCreditos(true);
-    setError(null);
-    try {
-      // Simulando petición a API
-      const nuevaTransaccion: Transaccion = {
-        id: `asig-${Date.now()}`,
-        usuarioId,
-        tipo: 'asignacion',
-        cantidad,
-        descripcion,
-        fecha: new Date()
-      };
+export const useCreditos = () => {
+  const context = useContext(CreditosContext);
+  if (context === undefined) {
+    throw new Error('useCreditos debe ser usado dentro de un CreditosProvider');
+  }
+  return context;
+};
 
-      setCreditos(prev => ({
-        ...prev,
-        disponibles: prev.disponibles + cantidad,
-        historial: [nuevaTransaccion, ...prev.historial]
-      }));
-
-      return true;
-    } catch (e) {
-      setError('Error al asignar créditos');
-      console.error(e);
-      return false;
-    } finally {
-      setCargandoCreditos(false);
-    }
-  };
-
-  // Consumir créditos al utilizar funcionalidades
-  const consumirCreditos = async (cantidad: number, descripcion: string, canal: Canal): Promise<boolean> => {
-    if (!verificarCreditosSuficientes(cantidad)) {
-      setError('No hay suficientes créditos disponibles');
-      return false;
-    }
-
-    setCargandoCreditos(true);
-    setError(null);
-    try {
-      // Simulando petición a API
-      const nuevaTransaccion: Transaccion = {
-        id: `cons-${Date.now()}`,
-        usuarioId: 'usuario-actual', // En un caso real, esto vendría del contexto de autenticación
-        tipo: 'consumo',
-        cantidad,
-        descripcion,
-        canal,
-        fecha: new Date()
-      };
-
-      setCreditos(prev => ({
-        ...prev,
-        disponibles: prev.disponibles - cantidad,
-        gastados: prev.gastados + cantidad,
-        historial: [nuevaTransaccion, ...prev.historial]
-      }));
-
-      return true;
-    } catch (e) {
-      setError('Error al consumir créditos');
-      console.error(e);
-      return false;
-    } finally {
-      setCargandoCreditos(false);
-    }
-  };
-
-  // Comprar créditos adicionales
-  const comprarCreditos = async (planId: string, cantidad: number, monto: number): Promise<boolean> => {
-    setCargandoCreditos(true);
-    setError(null);
-    try {
-      // Simulando petición a API y proceso de pago
-      const nuevaTransaccion: Transaccion = {
-        id: `comp-${Date.now()}`,
-        usuarioId: 'usuario-actual', // En un caso real, esto vendría del contexto de autenticación
-        tipo: 'compra',
-        cantidad,
-        descripcion: `Compra de ${cantidad} créditos - $${monto.toLocaleString('es-CO')}`,
-        fecha: new Date(),
-        planId
-      };
-
-      setCreditos(prev => ({
-        ...prev,
-        disponibles: prev.disponibles + cantidad,
-        historial: [nuevaTransaccion, ...prev.historial]
-      }));
-
-      return true;
-    } catch (e) {
-      setError('Error al procesar la compra de créditos');
-      console.error(e);
-      return false;
-    } finally {
-      setCargandoCreditos(false);
-    }
-  };
-
-  // Verificar si hay suficientes créditos para una operación
-  const verificarCreditosSuficientes = (cantidad: number): boolean => {
-    return creditos.disponibles >= cantidad;
-  };
-
-  // Actualizar el umbral de alerta para notificaciones
-  const actualizarUmbralAlerta = (umbral: number) => {
-    setCreditos(prev => ({
-      ...prev,
-      umbralAlerta: umbral
-    }));
-  };
-
-  // Efecto para verificar si los créditos están bajo el umbral y mostrar alerta
-  useEffect(() => {
-    if (creditos.disponibles > 0) {
-      const porcentajeDisponible = (creditos.disponibles / (creditos.disponibles + creditos.gastados)) * 100;
-      if (porcentajeDisponible <= creditos.umbralAlerta) {
-        // Aquí se podría mostrar una notificación al usuario
-        console.warn(`¡Alerta! Créditos por debajo del ${creditos.umbralAlerta}%`);
-      }
-    }
-  }, [creditos.disponibles, creditos.gastados, creditos.umbralAlerta]);
-
-  const value = {
-    creditos,
-    cargandoCreditos,
-    error,
-    cargarCreditosUsuario,
-    asignarCreditos,
-    consumirCreditos,
-    comprarCreditos,
-    verificarCreditosSuficientes,
-    actualizarUmbralAlerta
-  };
-
-  return <CreditosContext.Provider value={value}>{children}</CreditosContext.Provider>;
-}
+// Exportar el mismo hook con nombre alternativo para compatibilidad
+export const useCreditosContext = () => {
+  return useCreditos();
+};

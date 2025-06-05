@@ -2,8 +2,61 @@
 
 import React from 'react';
 import CreditosSummary from '@/components/creditos/CreditosSummary';
+import MencionesMap from '@/components/dashboard/MencionesMap';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, RefreshCw, TrendingUp, TrendingDown, Twitter, Facebook, Instagram, CreditCard } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+// Importar el mapa dinámicamente para evitar problemas con SSR
+const DynamicMencionesMap = dynamic(() => import('@/components/dashboard/MencionesMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[400px] w-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-md">
+      <div className="text-gray-500 dark:text-gray-400">Cargando mapa...</div>
+    </div>
+  ),
+});
+
+// Simulación de datos para garantizar visualización
+const simulationData = {
+  mentions: {
+    total: 1245,
+    positive: 845,
+    negative: 124,
+    neutral: 276,
+    trend: '+12%',
+    byPlatform: {
+      twitter: 682,
+      facebook: 215,
+      instagram: 178,
+      news: 92,
+      blogs: 78
+    },
+    recent: [
+      { id: 'm1', author: 'María López', content: 'Excelente servicio y atención', sentiment: 'positive', date: '2025-06-05T10:45:00', platform: 'twitter' },
+      { id: 'm2', author: 'Carlos Ruiz', content: 'Me encantó el producto, muy recomendable', sentiment: 'positive', date: '2025-06-05T09:30:00', platform: 'facebook' },
+      { id: 'm3', author: 'Ana Martínez', content: 'Tuve problemas con la entrega pero lo resolvieron rápido', sentiment: 'neutral', date: '2025-06-04T18:20:00', platform: 'instagram' }
+    ],
+    timeSeries: [
+      { date: '2025-06-01', value: 120 },
+      { date: '2025-06-02', value: 145 },
+      { date: '2025-06-03', value: 132 },
+      { date: '2025-06-04', value: 190 },
+      { date: '2025-06-05', value: 210 }
+    ]
+  },
+  reputation: {
+    score: 87,
+    previousScore: 82,
+    trend: 'up'
+  },
+  ranking: {
+    position: 3,
+    previousPosition: 5,
+    totalCompetitors: 28,
+    trend: 'up'
+  }
+};
 
 export default function Dashboard() {
   // Animación para las tarjetas
@@ -13,8 +66,8 @@ export default function Dashboard() {
       opacity: 1,
       y: 0,
       transition: {
-        delay: i * 0.1,
-        duration: 0.5,
+        delay: i * 0.05, // Reducir delay para que aparezcan más rápido
+        duration: 0.4,
         ease: 'easeOut'
       }
     })
@@ -24,16 +77,19 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Encabezado */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <button className="button-outline flex items-center text-sm">
-          <RefreshCw className="mr-2 h-4 w-4" /> Actualizar
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="mt-1 text-gray-600 dark:text-gray-300">Bienvenido a tu centro de monitoreo de reputación online</p>
+        </div>
+        <button className="button-primary flex items-center text-sm">
+          <RefreshCw className="mr-2 h-4 w-4" /> Actualizar Datos
         </button>
       </div>
 
       {/* Resumen de créditos */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         <div className="lg:col-span-2">
-          <CreditosSummary showDetails={false} />
+          <CreditosSummary showDetails={true} />
         </div>
         
         {/* Estadísticas rápidas */}
@@ -42,9 +98,9 @@ export default function Dashboard() {
           initial="hidden"
           animate="visible"
           variants={cardVariants}
-          className="card p-4"
+          className="card p-4 bg-white dark:bg-gray-800"
         >
-          <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Menciones Totales</h3>
+          <h3 className="mb-2 text-sm font-semibold text-gray-800 dark:text-gray-200">Menciones Totales</h3>
           <div className="flex items-end justify-between">
             <p className="text-3xl font-bold text-gray-900 dark:text-white">1,248</p>
             <div className="flex items-center text-green-600 dark:text-green-400">
@@ -57,6 +113,9 @@ export default function Dashboard() {
               <div className="h-2 rounded-full bg-primary-600" style={{ width: '70%' }}></div>
             </div>
           </div>
+          <div className="mt-2 text-xs text-gray-600 dark:text-gray-300">
+            <span className="font-medium">428</span> nuevas menciones esta semana
+          </div>
         </motion.div>
         
         <motion.div 
@@ -64,9 +123,9 @@ export default function Dashboard() {
           initial="hidden"
           animate="visible"
           variants={cardVariants}
-          className="card p-4"
+          className="card p-4 bg-white dark:bg-gray-800"
         >
-          <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Sentimiento Positivo</h3>
+          <h3 className="mb-2 text-sm font-semibold text-gray-800 dark:text-gray-200">Sentimiento Positivo</h3>
           <div className="flex items-end justify-between">
             <p className="text-3xl font-bold text-gray-900 dark:text-white">68.2%</p>
             <div className="flex items-center text-red-600 dark:text-red-400">
@@ -79,16 +138,30 @@ export default function Dashboard() {
               <div className="h-2 rounded-full bg-green-500" style={{ width: '68.2%' }}></div>
             </div>
           </div>
+          <div className="mt-2 flex justify-between text-xs text-gray-600 dark:text-gray-300">
+            <span>Negativo: <span className="font-medium">18.3%</span></span>
+            <span>Neutral: <span className="font-medium">13.5%</span></span>
+          </div>
         </motion.div>
       </div>
 
+      {/* Mapa de menciones */}
+      <div className="mb-6">
+        <DynamicMencionesMap />
+      </div>
+      
       {/* Menciones recientes y actividad */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Menciones recientes */}
         <div className="lg:col-span-2">
-          <div className="card overflow-hidden">
+          <div className="card overflow-hidden bg-white dark:bg-gray-800">
             <div className="border-b border-gray-200 p-4 dark:border-gray-700">
-              <h2 className="heading-secondary">Menciones Recientes</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="heading-secondary">Menciones Recientes</h2>
+                <span className="rounded-full bg-primary-100 px-2 py-1 text-xs font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+                  12 nuevas hoy
+                </span>
+              </div>
             </div>
             <div className="p-4">
               <div className="space-y-4">

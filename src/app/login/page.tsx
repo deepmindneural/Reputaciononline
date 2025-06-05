@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import gsap from 'gsap';
+import { fadeInUp, staggerFadeIn, createTimeline } from '../../lib/gsap-animations';
+import { aiPatternLearning, aiRecognitionResponse, aiNeuralConnections } from '../../lib/ai-animations';
+import AnimatedBackground from '../../components/ui/AnimatedBackground';
 
 export default function LoginPage() {
   // Estados para manejar la entrada de usuario
@@ -13,6 +16,74 @@ export default function LoginPage() {
   const [recordarme, setRecordarme] = useState(false);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
+  
+  // Referencias para animaciones
+  const titleRef = useRef<HTMLDivElement>(null);
+  const subtitleRef = useRef<HTMLHeadingElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  // Inicializar animaciones
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const tl = createTimeline({ defaults: { ease: 'power3.out' } });
+    
+    // Animar título y logo con efecto "inteligente"
+    if (titleRef.current) {
+      tl.from(titleRef.current, {
+        opacity: 0, 
+        y: -20, 
+        duration: 0.7,
+        clearProps: 'all'
+      });
+    }
+    
+    // Animar subtítulo con efecto adaptativo
+    if (subtitleRef.current) {
+      tl.from(subtitleRef.current, {
+        opacity: 0, 
+        filter: 'blur(8px)',
+        duration: 0.8,
+        clearProps: 'all'
+      }, '-=0.4');
+    }
+    
+    // Animar características con efecto de IA de reconocimiento de patrones
+    if (featuresRef.current && featuresRef.current.children.length > 0) {
+      aiPatternLearning(featuresRef.current, '*', {
+        delay: 0.3
+      });
+    }
+    
+    // Animar formulario con efecto "inteligente" de reconocimiento
+    if (formRef.current) {
+      const formInputs = formRef.current.querySelectorAll('input');
+      const formLabels = formRef.current.querySelectorAll('label');
+      const formButtons = formRef.current.querySelectorAll('button');
+      
+      tl.from(formRef.current, {
+        opacity: 0, 
+        scale: 0.95, 
+        duration: 0.5,
+        clearProps: 'all'
+      }, '-=0.2');
+      
+      // Simulación de análisis de campos - delay reducido para menor lag
+      aiNeuralConnections(Array.from(formLabels), Array.from(formInputs), {
+        delay: 0.2
+      });
+      
+      // Simulación de respuesta de IA al formulario - delay reducido
+      aiRecognitionResponse(formRef.current, Array.from(formButtons), {
+        delay: 0.4
+      });
+    }
+    
+    return () => {
+      tl.kill();
+    };
+  }, []);
 
   // Función para manejar el envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,17 +95,26 @@ export default function LoginPage() {
       return;
     }
     
-    // Simulación de inicio de sesión
+    // Autenticación con IndexedDB
     try {
       setCargando(true);
       setError('');
       
-      // Simulación de un proceso de autenticación
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Importar el servicio de DB bajo demanda (para evitar errores de SSR)
+      const { verifyUserCredentials } = await import('@/services/dbService');
+      const user = await verifyUserCredentials(email, password);
       
-      // Redirección a dashboard (en producción se haría después de autenticar)
-      window.location.href = '/dashboard';
+      if (user) {
+        // Guardar usuario en localStorage para mantener la sesión
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        
+        // Redirección a dashboard
+        window.location.href = '/dashboard';
+      } else {
+        setError('Credenciales incorrectas. Por favor verifica tu correo y contraseña.');
+      }
     } catch (err) {
+      console.error('Error de autenticación:', err);
       setError('Error al iniciar sesión. Verifica tus credenciales.');
     } finally {
       setCargando(false);
@@ -45,30 +125,28 @@ export default function LoginPage() {
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Panel lateral - Solo visible en pantallas medianas y grandes */}
       <div className="relative hidden w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 md:block">
+        <AnimatedBackground 
+          className="opacity-40" 
+          particleColor="rgba(255, 255, 255, 0.6)" 
+        />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-white">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+          <div
+            ref={titleRef}
             className="mb-8 flex items-center"
           >
             <div className="mr-3 h-12 w-12 rounded-full bg-white bg-opacity-20"></div>
             <h1 className="text-3xl font-bold">Reputación Online</h1>
-          </motion.div>
+          </div>
           
-          <motion.h2 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+          <h2 
+            ref={subtitleRef}
             className="mb-6 text-center text-2xl font-light"
           >
             Gestiona tu presencia digital con análisis avanzados y monitoreo en tiempo real
-          </motion.h2>
+          </h2>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+          <div
+            ref={featuresRef}
             className="mt-4 space-y-4"
           >
             <div className="flex items-center">
@@ -89,7 +167,7 @@ export default function LoginPage() {
               </div>
               <p>Gestión eficiente de créditos</p>
             </div>
-          </motion.div>
+          </div>
         </div>
         
         <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-white text-opacity-70">
@@ -99,10 +177,8 @@ export default function LoginPage() {
       
       {/* Formulario de inicio de sesión */}
       <div className="flex w-full items-center justify-center px-4 md:w-1/2 md:px-0">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+        <div 
+          ref={formRef}
           className="w-full max-w-md space-y-8 p-8"
         >
           {/* Logo solo visible en móviles */}
@@ -270,7 +346,7 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

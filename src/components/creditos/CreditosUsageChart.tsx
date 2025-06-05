@@ -12,22 +12,35 @@ interface ChartData {
 }
 
 export default function CreditosUsageChart() {
-  const { creditos } = useCreditosContext();
+  const { disponibles, historial } = useCreditosContext();
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState<'semana' | 'mes' | 'año'>('mes');
   
   // Generar datos para el gráfico de dona (distribución por canal)
   const generarDatosCanal = (): ChartData[] => {
-    // Agrupar transacciones de consumo por canal
-    const consumosPorCanal = creditos.historial
-      .filter(t => t.tipo === 'consumo' && t.canal)
-      .reduce<Record<string, number>>((acc, t) => {
-        const canal = t.canal || 'general';
-        acc[canal] = (acc[canal] || 0) + t.cantidad;
-        return acc;
-      }, {});
-      
+    // Calcular el consumo por canal basado en el historial
+    const consumosPorCanal: Record<string, number> = {};
+    
+    // Filtrar por transacciones de tipo egreso (consumo)
+    historial
+      .filter(tx => tx.tipo === 'egreso')
+      .forEach(tx => {
+        const canal = tx.canal || 'general';
+        if (!consumosPorCanal[canal]) {
+          consumosPorCanal[canal] = 0;
+        }
+        consumosPorCanal[canal] += tx.monto;
+      });
+    
+    // Si no hay datos (historial vacío), mostrar datos de ejemplo
+    if (Object.keys(consumosPorCanal).length === 0) {
+      consumosPorCanal['facebook'] = 150;
+      consumosPorCanal['twitter'] = 100;
+      consumosPorCanal['instagram'] = 75;
+      consumosPorCanal['general'] = 50;
+    }
+    
     // Convertir a formato de gráfico
-    return Object.entries(consumosPorCanal).map(([canal, valor], index) => {
+    return Object.entries(consumosPorCanal).map(([canal, valor]) => {
       // Colores para cada canal
       const colores = {
         facebook: '#1877F2',
@@ -35,7 +48,11 @@ export default function CreditosUsageChart() {
         twitter: '#1DA1F2',
         linkedin: '#0A66C2',
         tiktok: '#000000',
-        general: '#00B3B0'
+        general: '#00B3B0',
+        redes: '#5865F2',
+        noticias: '#FF4500',
+        monitoreo: '#4B0082',
+        reportes: '#008080'
       };
       
       return {
@@ -225,7 +242,7 @@ export default function CreditosUsageChart() {
               <p className="text-sm text-blue-800 dark:text-blue-300">
                 Con tu uso actual, tus créditos durarán aproximadamente {' '}
                 <span className="font-bold">
-                  {Math.round(creditos.disponibles / (totalConsumo / 30))} días
+                  {Math.round(disponibles / (totalConsumo / 30))} días
                 </span>.
               </p>
             </div>

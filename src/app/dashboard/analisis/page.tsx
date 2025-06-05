@@ -1,14 +1,33 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { Twitter, Facebook, Instagram, Linkedin, Youtube, Globe, Bookmark, Calendar, TrendingUp, AlertTriangle, CheckCircle2, RefreshCcw } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { 
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
+import { 
+  TrendingUp, TrendingDown, Minus, AlertCircle, CheckCircle, 
+  Twitter, Facebook, Instagram, Linkedin, Download, Filter 
+} from 'lucide-react';
 
-// Datos de muestra para análisis
+// Datos de ejemplo para los gráficos
+const datosSentimiento = [
+  { name: 'Positivo', value: 65, color: '#10b981' },
+  { name: 'Neutro', value: 25, color: '#6b7280' },
+  { name: 'Negativo', value: 10, color: '#ef4444' },
+];
+
+const datosPlataformas = [
+  { name: 'Twitter', value: 45, color: '#1DA1F2' },
+  { name: 'Facebook', value: 25, color: '#1877F2' },
+  { name: 'Instagram', value: 18, color: '#E4405F' },
+  { name: 'LinkedIn', value: 12, color: '#0A66C2' },
+];
+
 const datosMenciones = [
   { fecha: 'Ene', Twitter: 65, Facebook: 40, Instagram: 25, LinkedIn: 18 },
   { fecha: 'Feb', Twitter: 59, Facebook: 45, Instagram: 28, LinkedIn: 20 },
@@ -19,214 +38,342 @@ const datosMenciones = [
   { fecha: 'Jul', Twitter: 70, Facebook: 47, Instagram: 32, LinkedIn: 26 },
 ];
 
-const datosSentimiento = [
-  { name: 'Positivo', value: 65, color: '#10b981' },
-  { name: 'Neutro', value: 25, color: '#6b7280' },
-  { name: 'Negativo', value: 10, color: '#ef4444' },
+const datosEvolucionSentimiento = [
+  { mes: 'Ene', positivo: 45, neutro: 40, negativo: 15 },
+  { mes: 'Feb', positivo: 50, neutro: 35, negativo: 15 },
+  { mes: 'Mar', positivo: 55, neutro: 30, negativo: 15 },
+  { mes: 'Abr', positivo: 60, neutro: 30, negativo: 10 },
+  { mes: 'May', positivo: 65, neutro: 25, negativo: 10 },
+  { mes: 'Jun', positivo: 60, neutro: 30, negativo: 10 },
 ];
 
-const datosCanales = [
-  { name: 'Twitter', value: 45, color: '#1DA1F2' },
-  { name: 'Facebook', value: 25, color: '#1877F2' },
-  { name: 'Instagram', value: 18, color: '#E4405F' },
-  { name: 'LinkedIn', value: 12, color: '#0A66C2' },
-];
+// Componente para mostrar tendencia con icono
+const TrendIndicator = ({ value, suffix = '%' }) => {
+  if (value > 0) {
+    return (
+      <div className="flex items-center text-green-500">
+        <TrendingUp className="h-4 w-4 mr-1" />
+        <span>+{value}{suffix}</span>
+      </div>
+    );
+  } else if (value < 0) {
+    return (
+      <div className="flex items-center text-red-500">
+        <TrendingDown className="h-4 w-4 mr-1" />
+        <span>{value}{suffix}</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center text-gray-500">
+      <Minus className="h-4 w-4 mr-1" />
+      <span>Sin cambios</span>
+    </div>
+  );
+};
 
-const alertasRecientes = [
-  { id: 1, tipo: 'negativo', plataforma: 'Twitter', mensaje: 'Incremento de 15% en menciones negativas', fecha: 'Hace 2 horas' },
-  { id: 2, tipo: 'positivo', plataforma: 'Instagram', mensaje: 'Incremento de 25% en menciones positivas', fecha: 'Hace 5 horas' },
-  { id: 3, tipo: 'neutral', plataforma: 'Facebook', mensaje: 'Nuevo comentario de influencer identificado', fecha: 'Hace 1 día' },
-];
+// Componente para mostrar icono de plataforma
+const PlatformIcon = ({ platform }) => {
+  switch (platform.toLowerCase()) {
+    case 'twitter':
+      return <Twitter className="h-4 w-4 text-[#1DA1F2]" />;
+    case 'facebook':
+      return <Facebook className="h-4 w-4 text-[#1877F2]" />;
+    case 'instagram':
+      return <Instagram className="h-4 w-4 text-[#E4405F]" />;
+    case 'linkedin':
+      return <Linkedin className="h-4 w-4 text-[#0A66C2]" />;
+    default:
+      return null;
+  }
+};
 
 export default function AnalisisPage() {
-  const [cargando, setCargando] = useState(true);
+  const [activeTab, setActiveTab] = useState('resumen');
   
-  // Simular carga de datos
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setCargando(false);
-    }, 1200);
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
-  // Conseguir el icono correspondiente a cada plataforma
-  const getIconoPlataforma = (plataforma: string) => {
-    switch (plataforma) {
-      case 'Twitter':
-        return <Twitter className="h-5 w-5 text-[#1DA1F2]" />;
-      case 'Facebook':
-        return <Facebook className="h-5 w-5 text-[#1877F2]" />;
-      case 'Instagram':
-        return <Instagram className="h-5 w-5 text-[#E4405F]" />;
-      case 'LinkedIn':
-        return <Linkedin className="h-5 w-5 text-[#0A66C2]" />;
-      default:
-        return <Globe className="h-5 w-5 text-gray-500" />;
+  // Animaciones
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
     }
   };
-  
-  // Conseguir el icono y color para el tipo de alerta
-  const getAlertaInfo = (tipo: string) => {
-    switch (tipo) {
-      case 'positivo':
-        return { icono: <CheckCircle2 className="h-5 w-5 text-green-500" />, color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' };
-      case 'negativo':
-        return { icono: <AlertTriangle className="h-5 w-5 text-red-500" />, color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' };
-      default:
-        return { icono: <TrendingUp className="h-5 w-5 text-blue-500" />, color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
     }
   };
 
   return (
-    <div className="container mx-auto p-4 sm:p-6">
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-6"
-      >
-        <h1 className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">Análisis de Reputación</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Monitorea y analiza tu presencia online a través de diferentes plataformas
-        </p>
-      </motion.div>
-      
-      {cargando ? (
-        <div className="flex h-[60vh] items-center justify-center">
-          <div className="flex flex-col items-center">
-            <RefreshCcw className="h-12 w-12 animate-spin text-primary-600" />
-            <p className="mt-4 text-lg font-medium text-gray-600 dark:text-gray-400">Cargando análisis...</p>
-          </div>
+    <motion.div
+      className="container mx-auto py-6 space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Encabezado */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Análisis de Reputación</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Visualiza y analiza los datos de tu reputación online
+          </p>
         </div>
-      ) : (
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="mb-6 w-full justify-start rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
-            <TabsTrigger value="general" className="rounded-md px-4 py-2">
-              General
-            </TabsTrigger>
-            <TabsTrigger value="menciones" className="rounded-md px-4 py-2">
-              Menciones
-            </TabsTrigger>
-            <TabsTrigger value="sentimiento" className="rounded-md px-4 py-2">
-              Análisis de Sentimiento
-            </TabsTrigger>
-            <TabsTrigger value="canales" className="rounded-md px-4 py-2">
-              Canales
-            </TabsTrigger>
-          </TabsList>
-          
-          {/* Pestaña General */}
-          <TabsContent value="general" className="w-full">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-              >
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium">Menciones Totales</CardTitle>
-                    <CardDescription>Últimos 30 días</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-4xl font-bold text-primary-600 dark:text-primary-400">1,248</div>
-                    <p className="flex items-center text-sm text-green-600 dark:text-green-400">
-                      <TrendingUp className="mr-1 h-4 w-4" />
-                      <span>12% más que el mes anterior</span>
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-              >
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium">Sentimiento General</CardTitle>
-                    <CardDescription>Percepción de marca</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-4xl font-bold text-green-600 dark:text-green-400">Positivo</div>
-                    <p className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                      <span>65% menciones positivas</span>
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-              >
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium">Canal Principal</CardTitle>
-                    <CardDescription>Mayor actividad</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center">
-                      <Twitter className="h-8 w-8 text-[#1DA1F2]" />
-                      <div className="ml-3">
-                        <div className="text-2xl font-bold">Twitter</div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">45% del total de menciones</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
+        <div className="mt-4 flex space-x-3 md:mt-0">
+          <Button variant="outline" size="sm" className="flex items-center">
+            <Filter className="mr-2 h-4 w-4" />
+            Filtrar
+          </Button>
+          <Button variant="outline" size="sm" className="flex items-center">
+            <Download className="mr-2 h-4 w-4" />
+            Exportar
+          </Button>
+        </div>
+      </div>
+
+      {/* Pestañas de navegación */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="resumen">Resumen</TabsTrigger>
+          <TabsTrigger value="sentimiento">Sentimiento</TabsTrigger>
+          <TabsTrigger value="menciones">Menciones</TabsTrigger>
+          <TabsTrigger value="plataformas">Plataformas</TabsTrigger>
+        </TabsList>
+        
+        {/* Pestaña de Resumen */}
+        <TabsContent value="resumen" className="space-y-6">
+          {/* Tarjetas de métricas */}
+          <motion.div 
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            variants={itemVariants}
+          >
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">Menciones Totales</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">1,248</div>
+                <div className="mt-1 flex items-center text-xs">
+                  <TrendIndicator value={12} />
+                  <span className="ml-2 text-gray-500">vs. mes anterior</span>
+                </div>
+              </CardContent>
+            </Card>
             
-            <div className="mt-8">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">Sentimiento Positivo</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">65%</div>
+                <div className="mt-1 flex items-center text-xs">
+                  <TrendIndicator value={5} />
+                  <span className="ml-2 text-gray-500">vs. mes anterior</span>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">Plataforma Principal</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center">
+                  <Twitter className="h-5 w-5 text-[#1DA1F2] mr-2" />
+                  <span className="text-2xl font-bold">Twitter</span>
+                </div>
+                <div className="mt-1 flex items-center text-xs">
+                  <span className="text-gray-500">45% del total de menciones</span>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-500">Alcance Estimado</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">125K</div>
+                <div className="mt-1 flex items-center text-xs">
+                  <TrendIndicator value={8} />
+                  <span className="ml-2 text-gray-500">vs. mes anterior</span>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          
+          {/* Gráficos principales */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <motion.div variants={itemVariants}>
               <Card>
                 <CardHeader>
-                  <CardTitle>Alertas Recientes</CardTitle>
-                  <CardDescription>Cambios significativos en tu reputación online</CardDescription>
+                  <CardTitle>Análisis de Sentimiento</CardTitle>
+                  <CardDescription>Distribución de menciones por sentimiento</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {alertasRecientes.map((alerta) => {
-                      const { icono, color } = getAlertaInfo(alerta.tipo);
-                      return (
-                        <div 
-                          key={alerta.id}
-                          className="flex items-start rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-850"
+                  <div className="h-64 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={datosSentimiento}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                         >
-                          <div className={`mr-4 rounded-full p-2 ${color}`}>
-                            {icono}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center">
-                              {getIconoPlataforma(alerta.plataforma)}
-                              <span className="ml-2 font-medium">{alerta.plataforma}</span>
-                            </div>
-                            <p className="mt-1 text-gray-700 dark:text-gray-300">{alerta.mensaje}</p>
-                            <p className="mt-1 text-xs text-gray-500">{alerta.fecha}</p>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Bookmark className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      );
-                    })}
+                          {datosSentimiento.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
                   </div>
                 </CardContent>
-                <CardFooter className="border-t bg-gray-50 px-6 py-3 dark:border-gray-800 dark:bg-gray-900">
-                  <Button variant="outline" size="sm" className="ml-auto">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Ver historial completo
-                  </Button>
-                </CardFooter>
               </Card>
-            </div>
-          </TabsContent>
+            </motion.div>
+            
+            <motion.div variants={itemVariants}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Distribución por Plataformas</CardTitle>
+                  <CardDescription>Menciones por red social</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={datosPlataformas}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {datosPlataformas.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
           
-          {/* Pestaña de Menciones */}
-          <TabsContent value="menciones" className="w-full">
+          {/* Evolución temporal */}
+          <motion.div variants={itemVariants}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Evolución de Menciones</CardTitle>
+                <CardDescription>Menciones por plataforma en los últimos 7 meses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={datosMenciones}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="fecha" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="Twitter" stackId="a" fill="#1DA1F2" />
+                      <Bar dataKey="Facebook" stackId="a" fill="#1877F2" />
+                      <Bar dataKey="Instagram" stackId="a" fill="#E4405F" />
+                      <Bar dataKey="LinkedIn" stackId="a" fill="#0A66C2" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+        
+        {/* Pestaña de Sentimiento */}
+        <TabsContent value="sentimiento" className="space-y-6">
+          <motion.div variants={itemVariants}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Análisis de Sentimiento</CardTitle>
+                <CardDescription>Distribución detallada del sentimiento en las menciones</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-3">
+                  <div className="flex flex-col items-center justify-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <CheckCircle className="h-8 w-8 text-green-500 mb-2" />
+                    <h3 className="text-xl font-bold text-green-600 dark:text-green-400">65%</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Menciones Positivas</p>
+                    <div className="mt-2 flex items-center text-xs">
+                      <TrendIndicator value={5} />
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <Minus className="h-8 w-8 text-gray-500 mb-2" />
+                    <h3 className="text-xl font-bold text-gray-600 dark:text-gray-400">25%</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Menciones Neutras</p>
+                    <div className="mt-2 flex items-center text-xs">
+                      <TrendIndicator value={-3} />
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col items-center justify-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                    <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
+                    <h3 className="text-xl font-bold text-red-600 dark:text-red-400">10%</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Menciones Negativas</p>
+                    <div className="mt-2 flex items-center text-xs">
+                      <TrendIndicator value={-2} />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-8 h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={datosEvolucionSentimiento}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="mes" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="positivo" stroke="#10b981" strokeWidth={2} />
+                      <Line type="monotone" dataKey="neutro" stroke="#6b7280" strokeWidth={2} />
+                      <Line type="monotone" dataKey="negativo" stroke="#ef4444" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+        
+        {/* Pestaña de Menciones */}
+        <TabsContent value="menciones" className="space-y-6">
+          <motion.div variants={itemVariants}>
             <Card>
               <CardHeader>
                 <CardTitle>Evolución de Menciones</CardTitle>
@@ -263,22 +410,24 @@ export default function AnalisisPage() {
                 </div>
               </CardFooter>
             </Card>
-          </TabsContent>
-          
-          {/* Pestaña de Análisis de Sentimiento */}
-          <TabsContent value="sentimiento" className="w-full">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Distribución de Sentimiento</CardTitle>
-                  <CardDescription>Análisis global de percepción</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+          </motion.div>
+        </TabsContent>
+        
+        {/* Pestaña de Plataformas */}
+        <TabsContent value="plataformas" className="space-y-6">
+          <motion.div variants={itemVariants}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Distribución por Plataformas</CardTitle>
+                <CardDescription>Análisis detallado por red social</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div>
+                    <ResponsiveContainer width="100%" height={200}>
                       <PieChart>
                         <Pie
-                          data={datosSentimiento}
+                          data={datosPlataformas}
                           cx="50%"
                           cy="50%"
                           labelLine={false}
@@ -287,7 +436,7 @@ export default function AnalisisPage() {
                           dataKey="value"
                           label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                         >
-                          {datosSentimiento.map((entry, index) => (
+                          {datosPlataformas.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
@@ -295,113 +444,29 @@ export default function AnalisisPage() {
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Evolución del Sentimiento</CardTitle>
-                  <CardDescription>Cambios en la percepción en el tiempo</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={[
-                          { mes: 'Ene', positivo: 45, neutro: 40, negativo: 15 },
-                          { mes: 'Feb', positivo: 50, neutro: 35, negativo: 15 },
-                          { mes: 'Mar', positivo: 55, neutro: 30, negativo: 15 },
-                          { mes: 'Abr', positivo: 60, neutro: 30, negativo: 10 },
-                          { mes: 'May', positivo: 65, neutro: 25, negativo: 10 },
-                          { mes: 'Jun', positivo: 60, neutro: 30, negativo: 10 },
-                        ]}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="mes" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="positivo" stroke="#10b981" strokeWidth={2} />
-                        <Line type="monotone" dataKey="neutro" stroke="#6b7280" strokeWidth={2} />
-                        <Line type="monotone" dataKey="negativo" stroke="#ef4444" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          {/* Pestaña de Canales */}
-          <TabsContent value="canales" className="w-full">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Distribución por Canales</CardTitle>
-                  <CardDescription>Menciones por plataforma</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={datosCanales}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {datosCanales.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Rendimiento por Canal</CardTitle>
-                  <CardDescription>Comparativa de rendimiento</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {[
-                      { nombre: 'Twitter', valor: 85, color: '#1DA1F2' },
-                      { nombre: 'Facebook', valor: 70, color: '#1877F2' },
-                      { nombre: 'Instagram', valor: 65, color: '#E4405F' },
-                      { nombre: 'LinkedIn', valor: 60, color: '#0A66C2' },
-                    ].map((canal) => (
-                      <div key={canal.nombre} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            {getIconoPlataforma(canal.nombre)}
-                            <span className="ml-2 font-medium">{canal.nombre}</span>
+                  
+                  <div className="space-y-4">
+                    {datosPlataformas.map((platform) => (
+                      <div key={platform.name} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="flex items-center">
+                          <div className="p-2 rounded-full" style={{ backgroundColor: `${platform.color}20` }}>
+                            <PlatformIcon platform={platform.name} />
                           </div>
-                          <span>{canal.valor}%</span>
+                          <span className="ml-3 font-medium">{platform.name}</span>
                         </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                          <div 
-                            className="h-2 rounded-full" 
-                            style={{ width: `${canal.valor}%`, backgroundColor: canal.color }}
-                          ></div>
+                        <div className="text-right">
+                          <div className="font-bold">{platform.value}%</div>
+                          <div className="text-xs text-gray-500">{Math.round(platform.value * 12.48)} menciones</div>
                         </div>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      )}
-    </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+      </Tabs>
+    </motion.div>
   );
 }
