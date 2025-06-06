@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useCreditosContext } from '@/context/CreditosContext';
+import { useCreditosContext, HistorialTransaccion } from '@/context/CreditosContext';
 import { motion } from 'framer-motion';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -25,7 +25,7 @@ export default function EnhancedCreditosSummary({
     gastados, 
     totalAsignado, 
     isLoading: cargandoCreditos,
-    historialUso
+    historial
   } = useCreditosContext();
   
   const [animateValue, setAnimateValue] = useState(0);
@@ -36,8 +36,8 @@ export default function EnhancedCreditosSummary({
   const porcentajeGastado = total > 0 ? (gastados / total) * 100 : 0;
   
   // Calcular la tasa de consumo diario promedio
-  const consumoDiario = historialUso && historialUso.length > 1 
-    ? Math.round(historialUso.reduce((sum, item) => sum + item.cantidad, 0) / historialUso.length)
+  const consumoDiario = historial && historial.length > 1 
+    ? Math.round(historial.reduce((sum: number, item: HistorialTransaccion) => sum + item.monto, 0) / historial.length)
     : 0;
   
   // Estimar días restantes basado en el consumo diario
@@ -124,11 +124,11 @@ export default function EnhancedCreditosSummary({
 
   // Calcular la tendencia de uso (aumentando o disminuyendo)
   const calcularTendencia = () => {
-    if (!historialUso || historialUso.length < 4) return null;
+    if (!historial || historial.length < 4) return null;
     
-    const ultimosDias = historialUso.slice(-4);
-    const primerMitad = ultimosDias.slice(0, 2).reduce((sum, item) => sum + item.cantidad, 0);
-    const segundaMitad = ultimosDias.slice(-2).reduce((sum, item) => sum + item.cantidad, 0);
+    const ultimosDias = historial.slice(-4);
+    const primerMitad = ultimosDias.slice(0, 2).reduce((sum: number, item: HistorialTransaccion) => sum + item.monto, 0);
+    const segundaMitad = ultimosDias.slice(-2).reduce((sum: number, item: HistorialTransaccion) => sum + item.monto, 0);
     
     const diferencia = segundaMitad - primerMitad;
     const porcentaje = Math.round((diferencia / primerMitad) * 100);
