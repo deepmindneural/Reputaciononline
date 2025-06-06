@@ -134,7 +134,10 @@ const NeuralNetworkAnimation: React.FC<NeuralNetworkAnimationProps> = ({
       
       // Calcular distancias a todas las demás neuronas
       const distances = neurons.map((targetNeuron, index) => {
-        if (index === i) return Infinity; // Evitar autoconexiones
+        if (index === i) return {
+          index,
+          distance: Infinity // Evitar autoconexiones
+        };
         const dx = targetNeuron.x - sourceNeuron.x;
         const dy = targetNeuron.y - sourceNeuron.y;
         return {
