@@ -35,10 +35,10 @@ const SentimentAnalysis: React.FC<SentimentAnalysisProps> = ({ data, title }) =>
       y: 20,
       opacity: 0,
       ease: 'power3.out',
-      onComplete: animateBars
+      onComplete: () => animateBars(container)
     });
 
-    function animateBars() {
+    function animateBars(container: HTMLDivElement) {
       if (positiveBarRef.current) {
         gsap.fromTo(positiveBarRef.current, 
           { width: 0 }, 
