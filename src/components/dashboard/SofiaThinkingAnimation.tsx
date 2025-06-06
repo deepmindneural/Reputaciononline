@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Brain, MessageSquare } from 'lucide-react';
+import { Sparkles, MessageSquare } from 'lucide-react';
+import SofiaLogo from '@/components/icons/SofiaLogo';
 
 interface Particle {
   x: number;
@@ -24,13 +25,14 @@ interface SocialMention {
 
 interface SofiaThinkingAnimationProps {
   className?: string;
-  height?: number;
-  width?: number;
+  height?: number | string;
+  width?: number | string;
   particleCount?: number;
   showMentions?: boolean;
   theme?: 'light' | 'dark' | 'auto';
   title?: string;
   subtitle?: string;
+  responsive?: boolean;
 }
 
 const SofiaThinkingAnimation: React.FC<SofiaThinkingAnimationProps> = ({
@@ -41,15 +43,45 @@ const SofiaThinkingAnimation: React.FC<SofiaThinkingAnimationProps> = ({
   showMentions = true,
   theme = 'auto',
   title = "Sofia está analizando tus redes sociales",
-  subtitle = "Procesando menciones y sentimientos en tiempo real"
+  subtitle = "Procesando menciones y sentimientos en tiempo real",
+  responsive = true
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>(0);
   const particlesRef = useRef<Particle[]>([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mentions, setMentions] = useState<SocialMention[]>([]);
   const [activeMention, setActiveMention] = useState<SocialMention | null>(null);
   const [pulseEffect, setPulseEffect] = useState(false);
+  const [canvasSize, setCanvasSize] = useState({ 
+    width: typeof width === 'number' ? width : 500, 
+    height: typeof height === 'number' ? height : 300 
+  });
+
+  // Función para manejar el redimensionamiento responsive
+  const handleResize = useCallback(() => {
+    if (!responsive || !containerRef.current) return;
+    
+    const container = containerRef.current;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight || Math.floor(containerWidth * 0.6); // Proporción de aspecto 5:3
+    
+    setCanvasSize({
+      width: containerWidth,
+      height: containerHeight
+    });
+    
+    // Reiniciar partículas con nuevas dimensiones
+    if (particlesRef.current.length > 0) {
+      const particles = particlesRef.current.map(p => ({
+        ...p,
+        x: (p.x / canvasSize.width) * containerWidth,
+        y: (p.y / canvasSize.height) * containerHeight
+      }));
+      particlesRef.current = particles;
+    }
+  }, [responsive, canvasSize.width, canvasSize.height]);
 
   // Detectar tema oscuro
   useEffect(() => {
@@ -64,6 +96,25 @@ const SofiaThinkingAnimation: React.FC<SofiaThinkingAnimationProps> = ({
       setIsDarkMode(theme === 'dark');
     }
   }, [theme]);
+  
+  // Configurar el observador de redimensionamiento
+  useEffect(() => {
+    if (!responsive) return;
+    
+    handleResize();
+    
+    const resizeObserver = new ResizeObserver(handleResize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [responsive, handleResize]);
 
   // Generar partículas iniciales con colores degradados
   useEffect(() => {
@@ -79,10 +130,13 @@ const SofiaThinkingAnimation: React.FC<SofiaThinkingAnimationProps> = ({
       '#5352ED'  // Azul brillante
     ];
     
+    const canvasWidth = canvasSize.width;
+    const canvasHeight = canvasSize.height;
+    
     for (let i = 0; i < particleCount; i++) {
       particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
+        x: Math.random() * canvasWidth,
+        y: Math.random() * canvasHeight,
         size: Math.random() * 4 + 1,
         color: gradientColors[Math.floor(Math.random() * gradientColors.length)],
         speed: Math.random() * 1 + 0.2,
@@ -99,7 +153,7 @@ const SofiaThinkingAnimation: React.FC<SofiaThinkingAnimationProps> = ({
     return () => {
       cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [width, height, particleCount]);
+  }, [canvasSize.width, canvasSize.height, particleCount]);
 
   // Simular menciones entrantes
   useEffect(() => {
@@ -173,9 +227,9 @@ const SofiaThinkingAnimation: React.FC<SofiaThinkingAnimationProps> = ({
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const particles = particlesRef.current;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = Math.min(width, height) * 0.3;
+    const centerX = canvasSize.width / 2;
+    const centerY = canvasSize.height / 2;
+    const radius = Math.min(canvasSize.width, canvasSize.height) * 0.3;
     
     // Dibujar conexiones entre partículas cercanas
     ctx.lineWidth = 0.5;
@@ -257,18 +311,35 @@ const SofiaThinkingAnimation: React.FC<SofiaThinkingAnimationProps> = ({
     animationFrameRef.current = requestAnimationFrame(animate);
   };
 
+  // Actualizar el canvas cuando cambia el tamaño
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    canvas.width = canvasSize.width;
+    canvas.height = canvasSize.height;
+  }, [canvasSize]);
+
   return (
-    <div className={`relative ${className}`} style={{ height: `${height}px`, width: `${width}px` }}>
+    <div 
+      ref={containerRef}
+      className={`relative ${className}`} 
+      style={{
+        height: responsive ? '100%' : (typeof height === 'number' ? `${height}px` : height),
+        width: responsive ? '100%' : (typeof width === 'number' ? `${width}px` : width),
+        minHeight: '250px'
+      }}
+    >
       <canvas 
         ref={canvasRef} 
-        width={width} 
-        height={height}
+        width={canvasSize.width} 
+        height={canvasSize.height}
         className="absolute inset-0 rounded-lg"
       />
       
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 p-4">
         <div className="flex items-center mb-2">
-          <Brain className="mr-2 h-5 w-5 text-blue-500" />
+          <SofiaLogo className="mr-2 h-6 w-6 text-blue-500" />
           <h3 className="text-xl font-bold text-gray-800 dark:text-white">{title}</h3>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{subtitle}</p>

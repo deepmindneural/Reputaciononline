@@ -180,15 +180,16 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 p-0 overflow-hidden rounded-xl shadow-lg border border-blue-100 dark:border-gray-700">
-          <SofiaThinkingAnimation 
-            height={350} 
-            width={1200}
-            particleCount={100}
-            showMentions={true}
-            className="w-full"
-            title="Sofia está analizando tus redes sociales"
-            subtitle="Procesando menciones y sentimientos en tiempo real"
-          />
+          <div className="w-full" style={{ height: "350px" }}>
+            <SofiaThinkingAnimation 
+              particleCount={100}
+              showMentions={true}
+              responsive={true}
+              className="w-full h-full"
+              title="Sofia está analizando tus redes sociales"
+              subtitle="Procesando menciones y sentimientos en tiempo real"
+            />
+          </div>
         </div>
       </motion.div>
 
