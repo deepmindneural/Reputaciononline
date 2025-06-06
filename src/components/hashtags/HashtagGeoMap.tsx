@@ -1,9 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Circle, Tooltip, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
+
+// Importación dinámica del mapa completo para evitar errores de SSR
+const MapWithNoSSR = dynamic(
+  () => import('./LeafletMap').then((mod) => mod.default),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="h-96 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+        <span className="text-gray-500 dark:text-gray-400">Cargando mapa...</span>
+      </div>
+    )
+  }
+);
 
 // Tipos
 interface GeoPoint {
@@ -26,44 +38,6 @@ const HashtagGeoMap: React.FC<HashtagGeoMapProps> = ({
   geoData = demoGeoData,
   isLoading = false 
 }) => {
-  // Ajustar el tamaño del círculo según el conteo
-  const getCircleRadius = (count: number) => {
-    const baseSize = 15;
-    return Math.max(baseSize, Math.sqrt(count) * 2);
-  };
-
-  // Ajustar el color según la intensidad
-  const getCircleColor = (count: number) => {
-    const max = Math.max(...geoData.map(point => point.count));
-    const intensity = count / max;
-    
-    if (intensity > 0.75) return '#ef4444'; // Rojo intenso
-    if (intensity > 0.5) return '#fb923c'; // Naranja
-    if (intensity > 0.25) return '#facc15'; // Amarillo
-    return '#22c55e'; // Verde
-  };
-
-  // Asegurar que la referencia al mapa esté disponible en el cliente
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-            Distribución Geográfica #{hashtagName}
-          </h2>
-          <div className="h-96 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-            <span className="text-gray-500 dark:text-gray-400">Cargando mapa...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -111,37 +85,7 @@ const HashtagGeoMap: React.FC<HashtagGeoMapProps> = ({
         
         {/* Mapa */}
         <div className="h-96 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
-          <MapContainer 
-            center={[4.6097, -74.0817]} // Coordenadas centradas en Colombia
-            zoom={5} 
-            style={{ height: '100%', width: '100%' }}
-            attributionControl={false}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {geoData.map((point) => (
-              <Circle
-                key={point.id}
-                center={[point.lat, point.lng]}
-                radius={getCircleRadius(point.count) * 1000}
-                pathOptions={{
-                  color: getCircleColor(point.count),
-                  fillColor: getCircleColor(point.count),
-                  fillOpacity: 0.7
-                }}
-              >
-                <Popup>
-                  <div>
-                    <h3 className="font-medium">{point.city}, {point.country}</h3>
-                    <p><strong>{point.count}</strong> menciones de #{hashtagName}</p>
-                  </div>
-                </Popup>
-                <Tooltip>{point.city}: {point.count} menciones</Tooltip>
-              </Circle>
-            ))}
-          </MapContainer>
+          <MapWithNoSSR geoData={geoData} hashtagName={hashtagName} />
         </div>
         
         {/* Leyenda */}
