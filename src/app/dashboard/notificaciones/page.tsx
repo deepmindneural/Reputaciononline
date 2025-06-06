@@ -133,12 +133,12 @@ export default function NotificacionesPage() {
               {/* Icono */}
               <div className={`mr-4 rounded-full p-2 ${
                 notification.type === 'system' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 
-                notification.type === 'alert' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
+                notification.type === 'error' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
                 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
               }`}>
                 {notification.type === 'system' ? 
                   <BellIcon className="h-6 w-6" /> : 
-                  notification.type === 'alert' ? 
+                  notification.type === 'error' ? 
                     <User className="h-6 w-6" /> : 
                     <Calendar className="h-6 w-6" />
                 }
