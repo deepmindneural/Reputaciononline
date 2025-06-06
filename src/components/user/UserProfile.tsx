@@ -129,7 +129,7 @@ const UserProfile = () => {
               className="aspect-square h-full w-full"
             />
           ) : (
-            <User className="h-6 w-6 text-gray-400" />
+            <UserIcon className="h-6 w-6 text-gray-400" />
           )}
           <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-primary-500"></span>
         </span>
