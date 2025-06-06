@@ -60,7 +60,7 @@ export default function GeneradorReportes() {
     { valor: 'todos', nombre: 'Todos los canales' },
     { valor: 'facebook', nombre: 'Facebook' },
     { valor: 'instagram', nombre: 'Instagram' },
-    { valor: 'twitter', nombre: 'Twitter' },
+    { valor: 'x', nombre: 'X' },
     { valor: 'linkedin', nombre: 'LinkedIn' },
     { valor: 'tiktok', nombre: 'TikTok' },
     { valor: 'general', nombre: 'General' }
@@ -381,7 +381,7 @@ export default function GeneradorReportes() {
                       <td className="whitespace-nowrap px-4 py-2 text-right text-sm font-medium text-primary-600 dark:text-primary-400">36.2%</td>
                     </tr>
                     <tr>
-                      <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-900 dark:text-white">Twitter</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-900 dark:text-white">X</td>
                       <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-700 dark:text-gray-300">2,560</td>
                       <td className="whitespace-nowrap px-4 py-2 text-right text-sm font-medium text-primary-600 dark:text-primary-400">24.1%</td>
                     </tr>

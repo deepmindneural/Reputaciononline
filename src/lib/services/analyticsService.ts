@@ -206,7 +206,7 @@ export const getLatestMentions = async (limit: number = 5) => {
     const mentions = [
       {
         id: 'm1',
-        platform: 'twitter',
+        platform: 'x',
         author: 'Carlos Méndez',
         authorHandle: '@carlosmendez',
         profileImage: 'https://randomuser.me/api/portraits/men/32.jpg',
@@ -214,7 +214,7 @@ export const getLatestMentions = async (limit: number = 5) => {
         sentiment: 'positive',
         date: '2025-06-04T10:24:00',
         engagement: 38,
-        url: 'https://twitter.com'
+        url: 'https://x.com'
       },
       {
         id: 'm2',
@@ -266,7 +266,7 @@ export const getLatestMentions = async (limit: number = 5) => {
       },
       {
         id: 'm6',
-        platform: 'twitter',
+        platform: 'x',
         author: 'Patricia López',
         authorHandle: '@patricial',
         profileImage: 'https://randomuser.me/api/portraits/women/62.jpg',
@@ -274,7 +274,7 @@ export const getLatestMentions = async (limit: number = 5) => {
         sentiment: 'positive',
         date: '2025-06-03T11:45:00',
         engagement: 27,
-        url: 'https://twitter.com'
+        url: 'https://x.com'
       },
       {
         id: 'm7',
@@ -298,7 +298,7 @@ export const getLatestMentions = async (limit: number = 5) => {
     return [
       {
         id: 'fallback1',
-        platform: 'twitter',
+        platform: 'x',
         author: 'Usuario Ejemplo',
         authorHandle: '@usuario',
         profileImage: 'https://randomuser.me/api/portraits/men/1.jpg',
@@ -306,7 +306,7 @@ export const getLatestMentions = async (limit: number = 5) => {
         sentiment: 'positive',
         date: new Date().toISOString(),
         engagement: 10,
-        url: 'https://twitter.com'
+        url: 'https://x.com'
       },
       {
         id: 'fallback2',

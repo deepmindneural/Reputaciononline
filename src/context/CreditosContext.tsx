@@ -56,9 +56,9 @@ export const CreditosProvider: React.FC<{ children: ReactNode }> = ({ children }
             id: 'tx-002',
             fecha: '2025-06-01T10:12:00',
             monto: 250,
-            descripcion: 'Uso en campaña de Twitter',
+            descripcion: 'Uso en campaña de X',
             tipo: 'egreso',
-            canal: 'twitter'
+            canal: 'x'
           },
           {
             id: 'tx-003',

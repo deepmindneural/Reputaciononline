@@ -34,7 +34,7 @@ export default function CreditosUsageChart() {
     // Si no hay datos (historial vacío), mostrar datos de ejemplo
     if (Object.keys(consumosPorCanal).length === 0) {
       consumosPorCanal['facebook'] = 150;
-      consumosPorCanal['twitter'] = 100;
+      consumosPorCanal['x'] = 100;
       consumosPorCanal['instagram'] = 75;
       consumosPorCanal['general'] = 50;
     }
@@ -45,7 +45,7 @@ export default function CreditosUsageChart() {
       const colores = {
         facebook: '#1877F2',
         instagram: '#E4405F',
-        twitter: '#1DA1F2',
+        x: '#000000',
         linkedin: '#0A66C2',
         tiktok: '#000000',
         general: '#00B3B0',

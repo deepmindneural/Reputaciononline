@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Twitter, Facebook, Instagram, Linkedin, Youtube, Music, Globe, Check, AlertCircle, Plus, X } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Youtube, Music, Globe, Check, AlertCircle, Plus, X } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -23,7 +24,7 @@ type RedSocial = {
 export default function RedesSocialesPage() {
   // Estado para redes sociales conectadas y pendientes
   const [redesConectadas, setRedesConectadas] = useState<RedSocial[]>([
-    { id: 1, nombre: 'Twitter', icono: Twitter, usuario: '@tuempresa', followers: '5.2K', conectado: true, estado: 'activo', color: 'bg-blue-500' },
+    { id: 1, nombre: 'X', icono: XLogo, usuario: '@tuempresa', followers: '5.2K', conectado: true, estado: 'activo', color: 'bg-black' },
     { id: 2, nombre: 'Facebook', icono: Facebook, usuario: 'Tu Empresa', followers: '12.8K', conectado: true, estado: 'activo', color: 'bg-blue-600' },
     { id: 3, nombre: 'Instagram', icono: Instagram, usuario: '@tuempresa', followers: '8.7K', conectado: true, estado: 'activo', color: 'bg-pink-600' }
   ]);
@@ -335,7 +336,7 @@ export default function RedesSocialesPage() {
                 </div>
               )}
               
-              {(redSeleccionada?.nombre === 'Twitter' || redSeleccionada?.nombre === 'Facebook') && (
+              {(redSeleccionada?.nombre === 'X' || redSeleccionada?.nombre === 'Facebook') && (
                 <div className="grid gap-2">
                   <label htmlFor="token" className="text-sm font-medium">
                     API Token (opcional)

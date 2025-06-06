@@ -1,11 +1,13 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CreditosSummary from '@/components/creditos/CreditosSummary';
 import MencionesMap from '@/components/dashboard/MencionesMap';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, RefreshCw, TrendingUp, TrendingDown, Twitter, Facebook, Instagram, CreditCard } from 'lucide-react';
+import { ArrowUpRight, RefreshCw, TrendingUp, TrendingDown, Facebook, Instagram, CreditCard, Brain, Sparkles } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 import dynamic from 'next/dynamic';
+import SofiaThinkingAnimation from '@/components/dashboard/SofiaThinkingAnimation';
 
 // Importar el mapa dinámicamente para evitar problemas con SSR
 const DynamicMencionesMap = dynamic(() => import('@/components/dashboard/MencionesMap'), {
@@ -26,14 +28,14 @@ const simulationData = {
     neutral: 276,
     trend: '+12%',
     byPlatform: {
-      twitter: 682,
+      x: 682,
       facebook: 215,
       instagram: 178,
       news: 92,
       blogs: 78
     },
     recent: [
-      { id: 'm1', author: 'María López', content: 'Excelente servicio y atención', sentiment: 'positive', date: '2025-06-05T10:45:00', platform: 'twitter' },
+      { id: 'm1', author: 'María López', content: 'Excelente servicio y atención', sentiment: 'positive', date: '2025-06-05T10:45:00', platform: 'x' },
       { id: 'm2', author: 'Carlos Ruiz', content: 'Me encantó el producto, muy recomendable', sentiment: 'positive', date: '2025-06-05T09:30:00', platform: 'facebook' },
       { id: 'm3', author: 'Ana Martínez', content: 'Tuve problemas con la entrega pero lo resolvieron rápido', sentiment: 'neutral', date: '2025-06-04T18:20:00', platform: 'instagram' }
     ],
@@ -59,6 +61,19 @@ const simulationData = {
 };
 
 export default function Dashboard() {
+  // Estado para controlar la animación de redes neuronales
+  const [neuralNetworkMode, setNeuralNetworkMode] = useState<'sentiment' | 'platform' | 'engagement'>('sentiment');
+  const [isAnalyzing, setIsAnalyzing] = useState(true);
+  
+  // Efecto para simular análisis completado
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAnalyzing(false);
+    }, 15000); // 15 segundos de análisis
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
   // Animación para las tarjetas
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -145,6 +160,38 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
+      {/* Análisis de IA - Pensamiento de Sofia */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+            <Sparkles className="mr-2 h-5 w-5 text-blue-500" />
+            Sofia IA - Procesamiento Cognitivo
+          </h2>
+          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+            <span className="relative flex h-3 w-3 mr-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+            </span>
+            Analizando en tiempo real
+          </div>
+        </div>
+        <div className="card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 p-0 overflow-hidden rounded-xl shadow-lg border border-blue-100 dark:border-gray-700">
+          <SofiaThinkingAnimation 
+            height={350} 
+            width={1200}
+            particleCount={100}
+            showMentions={true}
+            className="w-full"
+            title="Sofia está analizando tus redes sociales"
+            subtitle="Procesando menciones y sentimientos en tiempo real"
+          />
+        </div>
+      </motion.div>
+
       {/* Mapa de menciones */}
       <div className="mb-6">
         <DynamicMencionesMap />
@@ -170,11 +217,11 @@ export default function Dashboard() {
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-500 dark:bg-blue-900 dark:text-blue-300">
-                        <Twitter className="h-5 w-5" />
+                        <XLogo className="h-5 w-5" />
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900 dark:text-white">@usuario123</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Twitter • Hace 2 horas</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">X • Hace 2 horas</p>
                       </div>
                     </div>
                     <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
@@ -251,7 +298,7 @@ export default function Dashboard() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    <span className="font-medium text-gray-900 dark:text-white">Análisis completado</span> para Twitter
+                    <span className="font-medium text-gray-900 dark:text-white">Análisis completado</span> para X
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Hace 30 minutos</p>
                 </div>

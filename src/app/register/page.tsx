@@ -210,35 +210,35 @@ export default function RegisterPage() {
         nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días desde hoy
         socialMedia: [
           {
-            platform: 'twitter' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            platform: 'x' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
             username: '',
             followers: 0,
             connected: false,
             profileUrl: ''
           },
           {
-            platform: 'facebook' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            platform: 'facebook' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
             username: '',
             followers: 0,
             connected: false,
             profileUrl: ''
           },
           {
-            platform: 'instagram' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            platform: 'instagram' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
             username: '',
             followers: 0,
             connected: false,
             profileUrl: ''
           },
           {
-            platform: 'linkedin' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            platform: 'linkedin' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
             username: '',
             followers: 0,
             connected: false,
             profileUrl: ''
           },
           {
-            platform: 'tiktok' as 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
+            platform: 'tiktok' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
             username: '',
             followers: 0,
             connected: false,

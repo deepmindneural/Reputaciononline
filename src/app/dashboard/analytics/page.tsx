@@ -32,13 +32,13 @@ const simulationData = {
     latestMentions: [
       {
         id: 'm001',
-        source: 'twitter',
+        source: 'x',
         author: 'María López',
         content: 'Excelente servicio de atención al cliente. Muy satisfecha con la rapidez de respuesta.',
         date: '2025-06-04T14:23:00',
         sentiment: 'positive',
         engagement: 158,
-        url: 'https://twitter.com/example/status/123456789'
+        url: 'https://x.com/example/status/123456789'
       },
       {
         id: 'm002',

@@ -19,11 +19,11 @@ const PREDEFINED_USERS = {
     nextBillingDate: '2025-07-01T00:00:00Z',
     socialMedia: [
       {
-        platform: 'twitter',
+        platform: 'x',
         username: 'ElmerZapataOficial',
         followers: 45200,
         connected: true,
-        profileUrl: 'https://twitter.com/ElmerZapataOficial'
+        profileUrl: 'https://x.com/ElmerZapataOficial'
       },
       {
         platform: 'facebook',
@@ -65,13 +65,13 @@ const PREDEFINED_USERS = {
       recentMentions: [
         {
           id: 'mention_001',
-          source: 'twitter',
+          source: 'x',
           author: '@ciudadano83',
           content: 'El discurso de @ElmerZapataOficial sobre políticas ambientales fue muy inspirador. Necesitamos más líderes así.',
           date: '2025-06-04T15:23:00Z',
           sentiment: 'positive',
           engagement: 342,
-          url: 'https://twitter.com/ciudadano83/status/12345'
+          url: 'https://x.com/ciudadano83/status/12345'
         },
         {
           id: 'mention_002',
@@ -133,11 +133,11 @@ const PREDEFINED_USERS = {
     nextBillingDate: '2025-06-20T00:00:00Z',
     socialMedia: [
       {
-        platform: 'twitter',
+        platform: 'x',
         username: 'LuciaMoralesOFC',
         followers: 18400,
         connected: false, // Necesita conectar esta red social
-        profileUrl: 'https://twitter.com/LuciaMoralesOFC'
+        profileUrl: 'https://x.com/LuciaMoralesOFC'
       },
       {
         platform: 'facebook',

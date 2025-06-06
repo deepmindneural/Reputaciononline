@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, AlertTriangle, User, MapPin, Briefcase, Twitter, Facebook, Instagram, Linkedin, Globe, ArrowUpRight } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, User, MapPin, Briefcase, Facebook, Instagram, Linkedin, Globe, ArrowUpRight } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 
 type ResultadoBusqueda = {
   id: string;
@@ -13,7 +14,7 @@ type ResultadoBusqueda = {
   sentimiento: 'positivo' | 'negativo' | 'neutro' | 'mixto';
   puntuacion: number;
   presencia: {
-    twitter: boolean;
+    x: boolean;
     facebook: boolean;
     instagram: boolean;
     linkedin: boolean;
@@ -94,7 +95,7 @@ export default function PersonaCard({ persona, onClick }: PersonaCardProps) {
           </div>
           
           <div className="flex space-x-1">
-            {persona.presencia.twitter && <Twitter className="h-4 w-4 text-[#1DA1F2]" />}
+            {persona.presencia.x && <XLogo className="h-4 w-4" />}
             {persona.presencia.facebook && <Facebook className="h-4 w-4 text-[#1877F2]" />}
             {persona.presencia.instagram && <Instagram className="h-4 w-4 text-[#E4405F]" />}
             {persona.presencia.linkedin && <Linkedin className="h-4 w-4 text-[#0A66C2]" />}

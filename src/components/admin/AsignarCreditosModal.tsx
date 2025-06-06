@@ -37,7 +37,7 @@ export default function AsignarCreditosModal({ isOpen, onClose, onConfirm }: Asi
   const canales = [
     { id: 'general', nombre: 'General' },
     { id: 'facebook', nombre: 'Facebook' },
-    { id: 'twitter', nombre: 'Twitter' },
+    { id: 'x', nombre: 'X' },
     { id: 'instagram', nombre: 'Instagram' },
     { id: 'linkedin', nombre: 'LinkedIn' },
     { id: 'tiktok', nombre: 'TikTok' },

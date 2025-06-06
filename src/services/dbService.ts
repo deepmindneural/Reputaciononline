@@ -27,11 +27,11 @@ const elmerZapataData: User = {
   nextBillingDate: '2025-07-01T00:00:00Z',
   socialMedia: [
     {
-      platform: 'twitter',
+      platform: 'x',
       username: 'ElmerZapataOficial',
       followers: 45200,
       connected: true,
-      profileUrl: 'https://twitter.com/ElmerZapataOficial'
+      profileUrl: 'https://x.com/ElmerZapataOficial'
     },
     {
       platform: 'facebook',
@@ -73,13 +73,13 @@ const elmerZapataData: User = {
     recentMentions: [
       {
         id: 'mention_001',
-        source: 'twitter',
+        source: 'x',
         author: '@ciudadano83',
         content: 'El discurso de @ElmerZapataOficial sobre políticas ambientales fue muy inspirador. Necesitamos más líderes así.',
         date: '2025-06-04T15:23:00Z',
         sentiment: 'positive',
         engagement: 342,
-        url: 'https://twitter.com/ciudadano83/status/12345'
+        url: 'https://x.com/ciudadano83/status/12345'
       },
       {
         id: 'mention_002',
@@ -140,11 +140,11 @@ const luciaData: User = {
   nextBillingDate: '2025-06-20T00:00:00Z',
   socialMedia: [
     {
-      platform: 'twitter',
+      platform: 'x',
       username: 'LuciaMoralesOFC',
       followers: 18400,
       connected: true,
-      profileUrl: 'https://twitter.com/LuciaMoralesOFC'
+      profileUrl: 'https://x.com/LuciaMoralesOFC'
     },
     {
       platform: 'facebook',
@@ -186,13 +186,13 @@ const luciaData: User = {
     recentMentions: [
       {
         id: 'mention_101',
-        source: 'twitter',
+        source: 'x',
         author: '@noticiasAhora',
         content: 'La diputada @LuciaMoralesOFC presentó un interesante proyecto para mejorar la transparencia en la gestión pública.',
         date: '2025-06-03T13:20:00Z',
         sentiment: 'positive',
         engagement: 145,
-        url: 'https://twitter.com/noticiasAhora/status/98765'
+        url: 'https://x.com/noticiasAhora/status/98765'
       },
       {
         id: 'mention_102',

@@ -5,7 +5,7 @@ import { gsap } from 'gsap';
 
 // Tipado para redes sociales
 interface SocialMedia {
-  platform: 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok';
+  platform: 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok';
   username: string;
   followers: number;
   connected: boolean;
@@ -15,7 +15,7 @@ interface SocialMedia {
 // Tipado para menciones
 interface Mention {
   id: string;
-  source: 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'news' | 'blogs';
+  source: 'x' | 'facebook' | 'instagram' | 'linkedin' | 'news' | 'blogs';
   author: string;
   content: string;
   date: string;

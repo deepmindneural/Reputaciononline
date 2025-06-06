@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useCreditosContext, HistorialTransaccion } from '@/context/CreditosContext';
 import { motion } from 'framer-motion';
 import { 
-  Facebook, Instagram, Twitter, Linkedin, 
+  Facebook, Instagram, Linkedin, 
   TrendingUp, TrendingDown, CreditCard, 
   Search, Calendar, Filter, ChevronDown
 } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 
-type FiltroCanal = 'todos' | 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'tiktok' | 'general';
+type FiltroCanal = 'todos' | 'facebook' | 'instagram' | 'x' | 'linkedin' | 'tiktok' | 'general';
 type FiltroTipo = 'todos' | 'ingreso' | 'egreso';
 
 export default function HistorialCreditos() {
@@ -78,8 +79,8 @@ export default function HistorialCreditos() {
         return <Facebook className="h-4 w-4 text-blue-600" />;
       case 'instagram':
         return <Instagram className="h-4 w-4 text-pink-600" />;
-      case 'twitter':
-        return <Twitter className="h-4 w-4 text-blue-400" />;
+      case 'x':
+        return <XLogo className="h-4 w-4" />;
       case 'linkedin':
         return <Linkedin className="h-4 w-4 text-blue-800" />;
       case 'tiktok':

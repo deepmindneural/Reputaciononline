@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search, User, MapPin, Briefcase, AlertTriangle, CheckCircle2, Clock, RefreshCcw, Facebook, Twitter, Instagram, Linkedin, Globe } from 'lucide-react';
+import { Search, User, MapPin, Briefcase, AlertTriangle, CheckCircle2, Clock, RefreshCcw, Facebook, Instagram, Linkedin, Globe } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 
 // Definición de tipos
 type ResultadoBusqueda = {
@@ -20,7 +21,7 @@ type ResultadoBusqueda = {
   sentimiento: 'positivo' | 'negativo' | 'neutro' | 'mixto';
   puntuacion: number;
   presencia: {
-    twitter: boolean;
+    x: boolean;
     facebook: boolean;
     instagram: boolean;
     linkedin: boolean;
@@ -113,7 +114,7 @@ const resultadosSimulados: ResultadoBusqueda[] = [
     sentimiento: 'positivo',
     puntuacion: 85,
     presencia: {
-      twitter: true,
+      x: true,
       facebook: true,
       instagram: true,
       linkedin: true,
@@ -131,7 +132,7 @@ const resultadosSimulados: ResultadoBusqueda[] = [
     sentimiento: 'neutro',
     puntuacion: 65,
     presencia: {
-      twitter: true,
+      x: true,
       facebook: true,
       instagram: true,
       linkedin: false,
@@ -149,7 +150,7 @@ const resultadosSimulados: ResultadoBusqueda[] = [
     sentimiento: 'mixto',
     puntuacion: 60,
     presencia: {
-      twitter: true,
+      x: true,
       facebook: false,
       instagram: true,
       linkedin: true,
@@ -167,7 +168,7 @@ const resultadosSimulados: ResultadoBusqueda[] = [
     sentimiento: 'negativo',
     puntuacion: 40,
     presencia: {
-      twitter: true,
+      x: true,
       facebook: true,
       instagram: false,
       linkedin: true,
@@ -216,7 +217,7 @@ const personaDetalleSimulada: PersonaDetalle = {
   ],
   redes: [
     {
-      plataforma: 'Twitter',
+      plataforma: 'X',
       usuario: '@carlosrodriguez',
       url: '#',
       seguidores: 58700,
@@ -410,10 +411,10 @@ export default function BusquedaPersonas() {
                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <h4 className="font-medium mb-2">Redes sociales</h4>
                       <div className="flex flex-wrap gap-2">
-                        {personaSeleccionada.presencia.twitter && (
+                        {personaSeleccionada.presencia.x && (
                           <Button variant="outline" size="sm" className="inline-flex items-center gap-1">
-                            <Twitter className="w-3 h-3" />
-                            <span>Twitter</span>
+                            <XLogo className="w-3 h-3" />
+                            <span>X</span>
                           </Button>
                         )}
                         {personaSeleccionada.presencia.facebook && (
@@ -543,7 +544,7 @@ export default function BusquedaPersonas() {
                           {personaSeleccionada.redes.map((red, index) => (
                             <div key={index} className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
                               <div className="flex items-center gap-2">
-                                {red.plataforma === 'Twitter' && <Twitter className="w-4 h-4" />}
+                                {red.plataforma === 'X' && <XLogo className="w-4 h-4" />}
                                 {red.plataforma === 'Facebook' && <Facebook className="w-4 h-4" />}
                                 {red.plataforma === 'Instagram' && <Instagram className="w-4 h-4" />}
                                 {red.plataforma === 'LinkedIn' && <Linkedin className="w-4 h-4" />}

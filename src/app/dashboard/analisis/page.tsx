@@ -11,8 +11,9 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, TrendingDown, Minus, AlertCircle, CheckCircle, 
-  Twitter, Facebook, Instagram, Linkedin, Download, Filter 
+  Facebook, Instagram, Linkedin, Download, Filter 
 } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 
 // Datos de ejemplo para los gráficos
 const datosSentimiento = [
@@ -22,20 +23,20 @@ const datosSentimiento = [
 ];
 
 const datosPlataformas = [
-  { name: 'Twitter', value: 45, color: '#1DA1F2' },
+  { name: 'X', value: 45, color: '#000000' },
   { name: 'Facebook', value: 25, color: '#1877F2' },
   { name: 'Instagram', value: 18, color: '#E4405F' },
   { name: 'LinkedIn', value: 12, color: '#0A66C2' },
 ];
 
 const datosMenciones = [
-  { fecha: 'Ene', Twitter: 65, Facebook: 40, Instagram: 25, LinkedIn: 18 },
-  { fecha: 'Feb', Twitter: 59, Facebook: 45, Instagram: 28, LinkedIn: 20 },
-  { fecha: 'Mar', Twitter: 80, Facebook: 50, Instagram: 35, LinkedIn: 25 },
-  { fecha: 'Abr', Twitter: 81, Facebook: 55, Instagram: 40, LinkedIn: 30 },
-  { fecha: 'May', Twitter: 56, Facebook: 48, Instagram: 38, LinkedIn: 28 },
-  { fecha: 'Jun', Twitter: 55, Facebook: 42, Instagram: 30, LinkedIn: 25 },
-  { fecha: 'Jul', Twitter: 70, Facebook: 47, Instagram: 32, LinkedIn: 26 },
+  { fecha: 'Ene', X: 65, Facebook: 40, Instagram: 25, LinkedIn: 18 },
+  { fecha: 'Feb', X: 59, Facebook: 45, Instagram: 28, LinkedIn: 20 },
+  { fecha: 'Mar', X: 80, Facebook: 50, Instagram: 35, LinkedIn: 25 },
+  { fecha: 'Abr', X: 81, Facebook: 55, Instagram: 40, LinkedIn: 30 },
+  { fecha: 'May', X: 56, Facebook: 48, Instagram: 38, LinkedIn: 28 },
+  { fecha: 'Jun', X: 55, Facebook: 42, Instagram: 30, LinkedIn: 25 },
+  { fecha: 'Jul', X: 70, Facebook: 47, Instagram: 32, LinkedIn: 26 },
 ];
 
 const datosEvolucionSentimiento = [
@@ -47,8 +48,19 @@ const datosEvolucionSentimiento = [
   { mes: 'Jun', positivo: 60, neutro: 30, negativo: 10 },
 ];
 
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
+
+interface PlatformIconProps {
+  platform: string;
+}
+
 // Componente para mostrar tendencia con icono
-const TrendIndicator = ({ value, suffix = '%' }) => {
+interface TrendIndicatorProps {
+  value: number;
+  suffix?: string;
+}
+
+const TrendIndicator = ({ value, suffix = '%' }: TrendIndicatorProps) => {
   if (value > 0) {
     return (
       <div className="flex items-center text-green-500">
@@ -73,10 +85,11 @@ const TrendIndicator = ({ value, suffix = '%' }) => {
 };
 
 // Componente para mostrar icono de plataforma
-const PlatformIcon = ({ platform }) => {
+const PlatformIcon: React.FC<PlatformIconProps> = ({ platform }) => {
   switch (platform.toLowerCase()) {
     case 'twitter':
-      return <Twitter className="h-4 w-4 text-[#1DA1F2]" />;
+    case 'x':
+      return <XLogo className="h-4 w-4" />;
     case 'facebook':
       return <Facebook className="h-4 w-4 text-[#1877F2]" />;
     case 'instagram':
@@ -188,8 +201,8 @@ export default function AnalisisPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
-                  <Twitter className="h-5 w-5 text-[#1DA1F2] mr-2" />
-                  <span className="text-2xl font-bold">Twitter</span>
+                  <XLogo className="h-5 w-5 mr-2" />
+                  <span className="text-2xl font-bold">X</span>
                 </div>
                 <div className="mt-1 flex items-center text-xs">
                   <span className="text-gray-500">45% del total de menciones</span>
@@ -299,7 +312,7 @@ export default function AnalisisPage() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="Twitter" stackId="a" fill="#1DA1F2" />
+                      <Bar dataKey="X" stackId="a" fill="#000000" />
                       <Bar dataKey="Facebook" stackId="a" fill="#1877F2" />
                       <Bar dataKey="Instagram" stackId="a" fill="#E4405F" />
                       <Bar dataKey="LinkedIn" stackId="a" fill="#0A66C2" />
@@ -391,7 +404,7 @@ export default function AnalisisPage() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="Twitter" stackId="a" fill="#1DA1F2" />
+                      <Bar dataKey="X" stackId="a" fill="#000000" />
                       <Bar dataKey="Facebook" stackId="a" fill="#1877F2" />
                       <Bar dataKey="Instagram" stackId="a" fill="#E4405F" />
                       <Bar dataKey="LinkedIn" stackId="a" fill="#0A66C2" />

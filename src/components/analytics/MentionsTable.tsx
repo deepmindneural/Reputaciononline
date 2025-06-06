@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { Twitter, Facebook, Linkedin, Instagram, MessageCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Facebook, Linkedin, Instagram, MessageCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 
 interface Mention {
   id: string;
@@ -67,7 +68,8 @@ const MentionsTable: React.FC<MentionsTableProps> = ({ mentions, title }) => {
   const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'twitter':
-        return <Twitter className="h-4 w-4 text-blue-400" />;
+      case 'x':
+        return <XLogo className="h-4 w-4" />;
       case 'facebook':
         return <Facebook className="h-4 w-4 text-blue-600" />;
       case 'linkedin':

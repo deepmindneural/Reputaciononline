@@ -11,8 +11,8 @@ export default function RecomendacionesCreditos() {
     optimizacionUso: [
       {
         id: 'rec1',
-        titulo: 'Optimiza tu uso en Twitter',
-        descripcion: 'Estás consumiendo más créditos de los necesarios en Twitter. Considera usar filtros más específicos.',
+        titulo: 'Optimiza tu uso en X',
+        descripcion: 'Estás consumiendo más créditos de los necesarios en X. Considera usar filtros más específicos.',
         impacto: 'Alto',
         ahorroPotencial: 1250,
         icono: <LineChart className="h-5 w-5 text-amber-500 dark:text-amber-400" />

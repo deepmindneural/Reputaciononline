@@ -4,17 +4,18 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Twitter, Facebook, Instagram, Globe } from 'lucide-react';
+import { Facebook, Instagram, Globe } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 import { motion } from 'framer-motion';
 
 // Necesitamos arreglar el problema de los iconos en Leaflet con Next.js
 import L from 'leaflet';
 
 // Definir iconos para diferentes plataformas
-const twitterIcon = L.divIcon({
+const xIcon = L.divIcon({
   className: 'custom-div-icon',
-  html: `<div style="background-color: #1DA1F2; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+  html: `<div style="background-color: #000000; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"></path><path d="M6 6L18 18"></path></svg>
          </div>`,
   iconSize: [30, 30],
   iconAnchor: [15, 15]
@@ -51,7 +52,8 @@ const defaultIcon = L.divIcon({
 const getIconByPlatform = (platform: string) => {
   switch (platform.toLowerCase()) {
     case 'twitter':
-      return twitterIcon;
+    case 'x':
+      return xIcon;
     case 'facebook':
       return facebookIcon;
     case 'instagram':
@@ -65,7 +67,8 @@ const getIconByPlatform = (platform: string) => {
 const PlatformIcon = ({ platform }: { platform: string }) => {
   switch (platform.toLowerCase()) {
     case 'twitter':
-      return <Twitter className="h-4 w-4 text-[#1DA1F2]" />;
+    case 'x':
+      return <XLogo className="h-4 w-4" />;
     case 'facebook':
       return <Facebook className="h-4 w-4 text-[#1877F2]" />;
     case 'instagram':
@@ -96,7 +99,7 @@ const menciones: Mencion[] = [
     author: '@usuario123',
     content: '¡Excelente servicio! Muy recomendado 👍',
     sentiment: 'positive',
-    platform: 'twitter',
+    platform: 'x',
     location: {
       lat: 4.6097,
       lng: -74.0817,
@@ -132,7 +135,7 @@ const menciones: Mencion[] = [
     author: '@tech_reviewer',
     content: 'La nueva actualización resolvió todos los problemas anteriores.',
     sentiment: 'positive',
-    platform: 'twitter',
+    platform: 'x',
     location: {
       lat: 10.9639,
       lng: -74.7964,
@@ -216,7 +219,7 @@ const MencionesMap = () => {
           <div className="mt-4 flex flex-wrap gap-3">
             <div className="flex items-center">
               <div className="h-3 w-3 rounded-full bg-[#1DA1F2] mr-1"></div>
-              <span className="text-xs text-gray-600 dark:text-gray-400">Twitter</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">X</span>
             </div>
             <div className="flex items-center">
               <div className="h-3 w-3 rounded-full bg-[#1877F2] mr-1"></div>

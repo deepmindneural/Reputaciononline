@@ -240,7 +240,7 @@ const demoHashtags: HashtagData[] = [
       { date: '2025-06-05T00:00:00', count: 889 }
     ],
     platforms: [
-      { name: 'Twitter', count: 2846, percentage: 62 },
+      { name: 'X', count: 2846, percentage: 62 },
       { name: 'Instagram', count: 921, percentage: 20 },
       { name: 'Facebook', count: 598, percentage: 13 },
       { name: 'TikTok', count: 217, percentage: 5 }
@@ -263,7 +263,7 @@ const demoHashtags: HashtagData[] = [
       { date: '2025-06-05T00:00:00', count: 450 }
     ],
     platforms: [
-      { name: 'Twitter', count: 987, percentage: 45 },
+      { name: 'X', count: 987, percentage: 45 },
       { name: 'Facebook', count: 743, percentage: 34 },
       { name: 'Instagram', count: 324, percentage: 15 },
       { name: 'TikTok', count: 133, percentage: 6 }
@@ -286,7 +286,7 @@ const demoHashtags: HashtagData[] = [
       { date: '2025-06-05T00:00:00', count: 105 }
     ],
     platforms: [
-      { name: 'Twitter', count: 896, percentage: 57 },
+      { name: 'X', count: 896, percentage: 57 },
       { name: 'Facebook', count: 382, percentage: 24 },
       { name: 'Instagram', count: 157, percentage: 10 },
       { name: 'Blogs', count: 151, percentage: 9 }
@@ -309,7 +309,7 @@ const demoHashtags: HashtagData[] = [
       { date: '2025-06-05T00:00:00', count: 685 }
     ],
     platforms: [
-      { name: 'Twitter', count: 1385, percentage: 43 },
+      { name: 'X', count: 1385, percentage: 43 },
       { name: 'Instagram', count: 982, percentage: 31 },
       { name: 'Facebook', count: 546, percentage: 17 },
       { name: 'TikTok', count: 301, percentage: 9 }

@@ -30,7 +30,7 @@ export default function AnalisisCreditosPage() {
   // Datos del análisis por canal (en un caso real vendrían del backend)
   const datosConsumoCanales = [
     { canal: 'Facebook', consumo: 3840, porcentaje: 36.2 },
-    { canal: 'Twitter', consumo: 2560, porcentaje: 24.1 },
+    { canal: 'X', consumo: 2560, porcentaje: 24.1 },
     { canal: 'Instagram', consumo: 1920, porcentaje: 18.1 },
     { canal: 'LinkedIn', consumo: 960, porcentaje: 9.0 },
     { canal: 'TikTok', consumo: 720, porcentaje: 6.8 },

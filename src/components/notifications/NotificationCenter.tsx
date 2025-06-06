@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, X, Check, ArrowRight, Twitter, Facebook, Instagram, ChevronDown } from 'lucide-react';
+import { Bell, X, Check, ArrowRight, Facebook, Instagram, ChevronDown } from 'lucide-react';
+import XLogo from '@/components/icons/XLogo';
 import { gsap } from 'gsap';
 import { useUser } from '@/context/UserContext';
 
@@ -36,10 +37,10 @@ const NotificationCenter: React.FC = () => {
   // Datos de menciones simulados para cuando no hay datos disponibles
   const simulatedMentions: SimulatedMention[] = [
     {
-      source: 'twitter',
+      source: 'x',
       content: 'Excelente servicio de atención al cliente. Muy satisfecha con la rapidez de respuesta.',
       date: new Date().toISOString(),
-      url: 'https://twitter.com/example/status/123456789'
+      url: 'https://x.com/example/status/123456789'
     },
     {
       source: 'facebook',
@@ -193,8 +194,8 @@ const NotificationCenter: React.FC = () => {
     if (!source) return null;
     
     switch (source.toLowerCase()) {
-      case 'twitter':
-        return <Twitter className="h-4 w-4 text-blue-400" />;
+      case 'x':
+        return <XLogo className="h-4 w-4" />;
       case 'facebook':
         return <Facebook className="h-4 w-4 text-blue-600" />;
       case 'instagram':

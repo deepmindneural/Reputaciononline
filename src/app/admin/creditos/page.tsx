@@ -174,7 +174,7 @@ export default function AdminCreditosPage() {
                 {
                   usuario: 'Juan Martínez',
                   tipo: 'consumo',
-                  canal: 'Twitter',
+                  canal: 'X',
                   descripcion: 'Monitoreo de menciones',
                   fecha: '28/05/2025 11:30',
                   cantidad: -850,

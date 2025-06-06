@@ -35,7 +35,7 @@ const transaccionesCredito = [
     fecha: new Date(2025, 5, 1),
     tipo: 'consumo',
     cantidad: 50,
-    descripcion: 'Monitoreo de menciones Twitter'
+    descripcion: 'Monitoreo de menciones X'
   },
   {
     id: '2',
@@ -112,7 +112,7 @@ const planes = [
 ];
 
 // Componente para mostrar tendencia con icono
-const TrendIndicator = ({ value, suffix = '%' }) => {
+const TrendIndicator = ({ value, suffix = '%' }: { value: number, suffix?: string }) => {
   if (value > 0) {
     return (
       <div className="flex items-center text-green-500">

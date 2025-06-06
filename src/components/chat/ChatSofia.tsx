@@ -139,7 +139,7 @@ const ChatSofia = () => {
       else if (lowerMsg.includes('analisis') || lowerMsg.includes('analytics') || lowerMsg.includes('análisis') || lowerMsg.includes('estadísticas')) {
         response = 'En el módulo de Analytics puedes consultar tu puntuación de reputación, menciones recientes y análisis de sentimiento. ¿Te gustaría un resumen de tus métricas actuales?';
       }
-      else if (lowerMsg.includes('redes') || lowerMsg.includes('twitter') || lowerMsg.includes('facebook') || lowerMsg.includes('instagram')) {
+      else if (lowerMsg.includes('redes') || lowerMsg.includes('x') || lowerMsg.includes('facebook') || lowerMsg.includes('instagram')) {
         response = 'Puedes conectar y gestionar todas tus redes sociales desde el módulo de Redes Sociales. ¿Necesitas ayuda para conectar alguna cuenta nueva?';
       }
       else {
