@@ -8,6 +8,29 @@ import CategorySelector from '@/components/user/CategorySelector';
 import SocialNetworkConnector from '@/components/user/SocialNetworkConnectorFixed';
 import ProfilePhotoUploader from '@/components/user/ProfilePhotoUploader';
 
+// Tipos para SocialConnectionsState
+interface SocialConnection {
+  connected: boolean;
+  username: string;
+  displayName: string;
+  followers: number;
+  profileImage: string;
+  lastSync: string | null;
+  metrics: {
+    posts: number;
+    engagement: number;
+    reach: number;
+  };
+}
+
+interface SocialConnectionsState {
+  facebook: SocialConnection;
+  instagram: SocialConnection;
+  x: SocialConnection;
+  linkedin: SocialConnection;
+  tiktok: SocialConnection;
+}
+
 interface CategoryData {
   category: string;
   brandName: string;
@@ -36,7 +59,7 @@ export default function OnboardingPage() {
     additionalSources: []
   });
   
-  const [connectedNetworks, setConnectedNetworks] = useState<string[]>([]);
+  const [connectedNetworks, setConnectedNetworks] = useState<SocialConnectionsState | null>(null);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(user?.avatarUrl || null);
 
   // Redirigir si el usuario ya completó el onboarding
