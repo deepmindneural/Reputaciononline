@@ -18,6 +18,8 @@ const elmerZapataData: User = {
   name: 'Elmer Zapata',
   email: 'elmer.zapata@example.com',
   profileType: 'political' as 'personal' | 'political' | 'business',
+  darkMode: false,
+  notifications: true,
   avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
   role: 'user' as 'user' | 'admin',
   createdAt: '2024-12-15T08:30:00Z',
@@ -131,6 +133,8 @@ const luciaData: User = {
   name: 'Lucía Morales',
   email: 'lucia.morales@example.com',
   profileType: 'political' as 'personal' | 'political' | 'business',
+  darkMode: true,
+  notifications: true,
   avatarUrl: 'https://randomuser.me/api/portraits/women/45.jpg',
   role: 'user' as 'user' | 'admin',
   createdAt: '2024-11-20T10:15:00Z',
@@ -400,6 +404,8 @@ export const verifyUserCredentials = (email: string, password: string): Promise<
           avatarUrl: '/images/avatars/elmer-zapata.jpg',
           createdAt: new Date().toISOString(),
           lastLogin: new Date().toISOString(),
+          darkMode: true,
+          notifications: true,
           settings: { darkMode: true, notifications: true }
         };
         
