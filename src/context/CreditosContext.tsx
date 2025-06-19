@@ -1,281 +1,292 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { gsap } from 'gsap';
 
-export interface HistorialTransaccion {
+// Tipos de datos
+export interface CreditTransaction {
   id: string;
-  fecha: string;
-  monto: number;
-  descripcion: string;
-  tipo: 'ingreso' | 'egreso';
-  canal?: string;
+  date: string;
+  amount: number;
+  type: 'purchase' | 'usage' | 'bonus';
+  description: string;
+  service?: string;
+  status: 'completed' | 'pending' | 'failed';
 }
 
-interface CreditosContextType {
-  saldo: number;
-  historial: HistorialTransaccion[];
-  comprarCreditos: (monto: number) => void;
-  usarCreditos: (monto: number, descripcion: string) => void;
+export interface CreditPlan {
+  id: string;
+  name: string;
+  credits: number;
+  price: number;
+  features: string[];
+  popular?: boolean;
+}
+
+interface CreditContextType {
+  // Estados principales
+  currentBalance: number;
+  totalPurchased: number;
+  totalUsed: number;
   isLoading: boolean;
-  // Propiedades adicionales necesarias para componentes
-  disponibles: number;
-  gastados: number;
-  umbralAlerta: number;
-  totalAsignado: number;
+  
+  // Historial y transacciones
+  transactions: CreditTransaction[];
+  
+  // Planes disponibles
+  availablePlans: CreditPlan[];
+  
+  // Acciones
+  purchaseCredits: (planId: string) => Promise<boolean>;
+  useCredits: (amount: number, service: string, description: string) => Promise<boolean>;
+  refreshData: () => Promise<void>;
+  
+  // Utilidades
+  getMonthlyUsage: () => number;
+  getWeeklyUsage: () => number;
+  getUsageByService: (service: string) => number;
 }
 
-const CreditosContext = createContext<CreditosContextType | undefined>(undefined);
+const CreditContext = createContext<CreditContextType | undefined>(undefined);
 
-export const CreditosProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [saldo, setSaldo] = useState<number>(2500);
-  const [historial, setHistorial] = useState<HistorialTransaccion[]>([]);
+// Datos simulados para demostración
+const DEMO_PLANS: CreditPlan[] = [
+  {
+    id: 'basic',
+    name: 'Plan Básico',
+    credits: 1000,
+    price: 89900,
+    features: [
+      'Monitoreo de 3 redes sociales',
+      'Análisis básico de sentimiento',
+      'Reportes mensuales',
+      'Soporte por email'
+    ]
+  },
+  {
+    id: 'professional',
+    name: 'Plan Professional',
+    credits: 3000,
+    price: 199900,
+    popular: true,
+    features: [
+      'Monitoreo de 10 redes sociales',
+      'Análisis avanzado de sentimiento',
+      'Reportes personalizados',
+      'Alertas en tiempo real',
+      'Soporte prioritario'
+    ]
+  },
+  {
+    id: 'enterprise',
+    name: 'Plan Empresarial',
+    credits: 10000,
+    price: 499900,
+    features: [
+      'Monitoreo ilimitado',
+      'IA avanzada y predicciones',
+      'API personalizada',
+      'Reportes ejecutivos',
+      'Soporte 24/7',
+      'Gestor de cuenta dedicado'
+    ]
+  }
+];
+
+const DEMO_TRANSACTIONS: CreditTransaction[] = [
+  {
+    id: 'tx-001',
+    date: '2025-06-15T10:30:00Z',
+    amount: 3000,
+    type: 'purchase',
+    description: 'Compra Plan Professional',
+    status: 'completed'
+  },
+  {
+    id: 'tx-002',
+    date: '2025-06-14T14:20:00Z',
+    amount: -150,
+    type: 'usage',
+    description: 'Análisis de sentimiento - Instagram',
+    service: 'sentiment_analysis',
+    status: 'completed'
+  },
+  {
+    id: 'tx-003',
+    date: '2025-06-13T09:45:00Z',
+    amount: -75,
+    type: 'usage',
+    description: 'Monitoreo menciones - Twitter/X',
+    service: 'social_monitoring',
+    status: 'completed'
+  },
+  {
+    id: 'tx-004',
+    date: '2025-06-12T16:15:00Z',
+    amount: -200,
+    type: 'usage',
+    description: 'Análisis competencia - Facebook',
+    service: 'competitor_analysis',
+    status: 'completed'
+  },
+  {
+    id: 'tx-005',
+    date: '2025-06-10T11:00:00Z',
+    amount: 500,
+    type: 'bonus',
+    description: 'Bono de bienvenida',
+    status: 'completed'
+  }
+];
+
+export const CreditProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [currentBalance, setCurrentBalance] = useState<number>(0);
+  const [totalPurchased, setTotalPurchased] = useState<number>(0);
+  const [totalUsed, setTotalUsed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
-  // Estados adicionales necesarios para componentes existentes
-  const [gastados, setGastados] = useState<number>(250); // Valor inicial para demo
+  const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
+  const [availablePlans] = useState<CreditPlan[]>(DEMO_PLANS);
 
-  // Simulación de carga de datos inicial
+  // Inicializar datos
   useEffect(() => {
-    const cargarDatos = async () => {
+    const initializeData = async () => {
       try {
-        // Simular llamada a API
-        await new Promise(resolve => setTimeout(resolve, 800));
+        setIsLoading(true);
         
-        // Datos simulados para el usuario
-        const historialInicial: HistorialTransaccion[] = [
-          {
-            id: 'tx-001',
-            fecha: '2025-06-03T15:30:00',
-            monto: 500,
-            descripcion: 'Compra de créditos',
-            tipo: 'ingreso',
-            canal: 'general'
-          },
-          {
-            id: 'tx-002',
-            fecha: '2025-06-01T10:12:00',
-            monto: 250,
-            descripcion: 'Uso en campaña de X',
-            tipo: 'egreso',
-            canal: 'x'
-          },
-          {
-            id: 'tx-003',
-            fecha: '2025-05-28T14:45:00',
-            monto: 1000,
-            descripcion: 'Créditos de bienvenida',
-            tipo: 'ingreso',
-            canal: 'general'
-          },
-          {
-            id: 'tx-004',
-            fecha: '2025-05-25T09:30:00',
-            monto: 1500,
-            descripcion: 'Compra de créditos',
-            tipo: 'ingreso',
-            canal: 'general'
-          },
-          {
-            id: 'tx-005',
-            fecha: '2025-05-20T11:15:00',
-            monto: 150,
-            descripcion: 'Análisis de reputación en Facebook',
-            tipo: 'egreso',
-            canal: 'facebook'
-          },
-          {
-            id: 'tx-006',
-            fecha: '2025-05-15T16:30:00',
-            monto: 100,
-            descripcion: 'Monitoreo avanzado de Instagram',
-            tipo: 'egreso',
-            canal: 'instagram'
-          },
-          {
-            id: 'tx-007',
-            fecha: '2025-05-10T13:20:00',
-            monto: 75,
-            descripcion: 'Análisis de LinkedIn',
-            tipo: 'egreso',
-            canal: 'linkedin'
-          },
-          {
-            id: 'tx-008',
-            fecha: '2025-05-05T08:45:00',
-            monto: 50,
-            descripcion: 'Monitoreo de TikTok',
-            tipo: 'egreso',
-            canal: 'tiktok'
-          }
-        ];
+        // Simular carga de datos desde API
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Calcular el saldo actual basado en el historial
-        const saldoCalculado = historialInicial.reduce((acc, tx) => {
-          return tx.tipo === 'ingreso' ? acc + tx.monto : acc - tx.monto;
-        }, 0);
+        setTransactions(DEMO_TRANSACTIONS);
         
-        setSaldo(saldoCalculado);
-        setHistorial(historialInicial);
-        setGastados(historialInicial
-          .filter(tx => tx.tipo === 'egreso')
-          .reduce((sum, tx) => sum + tx.monto, 0));
-        setIsLoading(false);
+        // Calcular totales basados en transacciones
+        const purchased = DEMO_TRANSACTIONS
+          .filter(t => t.type === 'purchase' || t.type === 'bonus')
+          .reduce((sum, t) => sum + t.amount, 0);
+        
+        const used = Math.abs(DEMO_TRANSACTIONS
+          .filter(t => t.type === 'usage')
+          .reduce((sum, t) => sum + t.amount, 0));
+        
+        setTotalPurchased(purchased);
+        setTotalUsed(used);
+        setCurrentBalance(purchased - used);
+        
       } catch (error) {
-        console.error("Error cargando datos de créditos:", error);
+        console.error('Error inicializando datos de créditos:', error);
+      } finally {
         setIsLoading(false);
       }
     };
 
-    cargarDatos();
+    initializeData();
   }, []);
 
-  const comprarCreditos = (monto: number) => {
-    if (monto <= 0) return;
-    
-    const nuevaTransaccion: HistorialTransaccion = {
-      id: `tx-${Date.now()}`,
-      fecha: new Date().toISOString(),
-      monto,
-      descripcion: 'Compra de créditos',
-      tipo: 'ingreso'
-    };
-    
-    // Actualizar saldo con animación
-    const elementoSaldo = document.getElementById('saldo-creditos');
-    if (elementoSaldo) {
-      const saldoOriginal = saldo;
-      const saldoNuevo = saldo + monto;
-      
-      gsap.to({}, {
-        duration: 1,
-        onUpdate: function() {
-          const progress = this.progress();
-          const valorActual = saldoOriginal + Math.round(progress * monto);
-          elementoSaldo.textContent = valorActual.toLocaleString();
-        },
-        onComplete: function() {
-          elementoSaldo.textContent = saldoNuevo.toLocaleString();
-        }
-      });
+  const purchaseCredits = async (planId: string): Promise<boolean> => {
+    try {
+      const plan = availablePlans.find(p => p.id === planId);
+      if (!plan) return false;
+
+      const newTransaction: CreditTransaction = {
+        id: `tx-${Date.now()}`,
+        date: new Date().toISOString(),
+        amount: plan.credits,
+        type: 'purchase',
+        description: `Compra ${plan.name}`,
+        status: 'completed'
+      };
+
+      setTransactions(prev => [newTransaction, ...prev]);
+      setCurrentBalance(prev => prev + plan.credits);
+      setTotalPurchased(prev => prev + plan.credits);
+
+      return true;
+    } catch (error) {
+      console.error('Error comprando créditos:', error);
+      return false;
     }
-    
-    setSaldo(prevSaldo => prevSaldo + monto);
-    setHistorial(prevHistorial => [nuevaTransaccion, ...prevHistorial]);
-    
-    // Mostrar notificación visual
-    const notificacion = document.createElement('div');
-    notificacion.className = 'fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md z-50';
-    notificacion.innerHTML = `
-      <div class="flex">
-        <div class="py-1">
-          <svg class="h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-        </div>
-        <div>
-          <p class="font-bold">Créditos añadidos</p>
-          <p>Se han añadido ${monto} créditos a tu cuenta.</p>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(notificacion);
-    
-    gsap.fromTo(notificacion, 
-      { y: -50, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
-    );
-    
-    setTimeout(() => {
-      gsap.to(notificacion, {
-        y: -50,
-        opacity: 0,
-        duration: 0.5,
-        ease: 'power2.in',
-        onComplete: () => {
-          notificacion.remove();
-        }
-      });
-    }, 3000);
   };
 
-  const usarCreditos = (monto: number, descripcion: string) => {
-    if (monto <= 0 || monto > saldo) return;
-    
-    const nuevaTransaccion: HistorialTransaccion = {
-      id: `tx-${Date.now()}`,
-      fecha: new Date().toISOString(),
-      monto,
-      descripcion,
-      tipo: 'egreso'
-    };
-    
-    // Actualizar saldo con animación
-    const elementoSaldo = document.getElementById('saldo-creditos');
-    if (elementoSaldo) {
-      const saldoOriginal = saldo;
-      const saldoNuevo = saldo - monto;
-      
-      gsap.to({}, {
-        duration: 1,
-        onUpdate: function() {
-          const progress = this.progress();
-          const valorActual = saldoOriginal - Math.round(progress * monto);
-          elementoSaldo.textContent = valorActual.toLocaleString();
-        },
-        onComplete: function() {
-          elementoSaldo.textContent = saldoNuevo.toLocaleString();
-        }
-      });
+  const useCredits = async (amount: number, service: string, description: string): Promise<boolean> => {
+    try {
+      if (currentBalance < amount) return false;
+
+      const newTransaction: CreditTransaction = {
+        id: `tx-${Date.now()}`,
+        date: new Date().toISOString(),
+        amount: -amount,
+        type: 'usage',
+        description,
+        service,
+        status: 'completed'
+      };
+
+      setTransactions(prev => [newTransaction, ...prev]);
+      setCurrentBalance(prev => prev - amount);
+      setTotalUsed(prev => prev + amount);
+
+      return true;
+    } catch (error) {
+      console.error('Error usando créditos:', error);
+      return false;
     }
-    
-    setSaldo(prevSaldo => prevSaldo - monto);
-    setHistorial(prevHistorial => [nuevaTransaccion, ...prevHistorial]);
   };
 
-  // Calcular valores adicionales
-  const disponibles = saldo;
-  const totalAsignado = saldo + gastados;
-  const umbralAlerta = 20; // Porcentaje de alerta cuando los créditos bajan de este nivel
+  const refreshData = async (): Promise<void> => {
+    setIsLoading(true);
+    // Simular actualización de datos
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setIsLoading(false);
+  };
 
-  // Actualizar gastados cuando se usa créditos
-  useEffect(() => {
-    // Calcular gastados basado en el historial de egresos
-    const totalGastado = historial
-      .filter(tx => tx.tipo === 'egreso')
-      .reduce((sum, tx) => sum + tx.monto, 0);
+  const getMonthlyUsage = (): number => {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     
-    setGastados(totalGastado);
-  }, [historial]);
+    return Math.abs(transactions
+      .filter(t => t.type === 'usage' && new Date(t.date) >= monthStart)
+      .reduce((sum, t) => sum + t.amount, 0));
+  };
+
+  const getWeeklyUsage = (): number => {
+    const now = new Date();
+    const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+    
+    return Math.abs(transactions
+      .filter(t => t.type === 'usage' && new Date(t.date) >= weekStart)
+      .reduce((sum, t) => sum + t.amount, 0));
+  };
+
+  const getUsageByService = (service: string): number => {
+    return Math.abs(transactions
+      .filter(t => t.type === 'usage' && t.service === service)
+      .reduce((sum, t) => sum + t.amount, 0));
+  };
+
+  const contextValue: CreditContextType = {
+    currentBalance,
+    totalPurchased,
+    totalUsed,
+    isLoading,
+    transactions,
+    availablePlans,
+    purchaseCredits,
+    useCredits,
+    refreshData,
+    getMonthlyUsage,
+    getWeeklyUsage,
+    getUsageByService
+  };
 
   return (
-    <CreditosContext.Provider
-      value={{
-        saldo,
-        historial,
-        comprarCreditos,
-        usarCreditos,
-        isLoading,
-        disponibles,
-        gastados,
-        umbralAlerta,
-        totalAsignado
-      }}
-    >
+    <CreditContext.Provider value={contextValue}>
       {children}
-    </CreditosContext.Provider>
+    </CreditContext.Provider>
   );
 };
 
-export const useCreditos = () => {
-  const context = useContext(CreditosContext);
-  if (context === undefined) {
-    throw new Error('useCreditos debe ser usado dentro de un CreditosProvider');
+export const useCredits = (): CreditContextType => {
+  const context = useContext(CreditContext);
+  if (!context) {
+    throw new Error('useCredits debe usarse dentro de CreditProvider');
   }
   return context;
-};
-
-// Exportar el mismo hook con nombre alternativo para compatibilidad
-export const useCreditosContext = () => {
-  return useCreditos();
 };

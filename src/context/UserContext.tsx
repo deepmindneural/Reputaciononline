@@ -41,20 +41,36 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  company?: string;  // Agregado campo company
+  company?: string;
+  phone?: string;
+  telefono?: string; 
+  empresa?: string; 
+  bio?: string;
   profileType?: 'personal' | 'political' | 'business';
+  category?: string;
+  profileCategory?: string; 
+  brandName?: string;
+  otherCategory?: string;
+  additionalSources?: string[];
+  partidoPolitico?: string;
+  cargoActual?: string;
+  propuestasPrincipales?: string;
   avatarUrl: string;
+  avatar?: string; 
   role: 'user' | 'admin';
   createdAt: string;
-  lastLogin: string;
+  lastLogin?: string;
   plan: 'free' | 'basic' | 'pro' | 'enterprise';
   credits: number;
   isPro?: boolean;
+  onboardingCompleted?: boolean;
   settings?: {
     darkMode: boolean;
     notifications: boolean;
     [key: string]: any;
   };
+  darkMode: boolean;
+  notifications: boolean;
   nextBillingDate?: string;
   socialMedia?: SocialMedia[];
   reputation?: ReputationData;
@@ -76,7 +92,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Función para obtener usuario desde localStorage
 const getUserFromLocalStorage = (): User | null => {
-  if (typeof window === 'undefined') return null; // Server-side rendering check
+  if (typeof window === 'undefined') return null;
   
   const userStr = localStorage.getItem('currentUser');
   if (!userStr) return null;
@@ -89,109 +105,155 @@ const getUserFromLocalStorage = (): User | null => {
   }
 };
 
-// Inicializa la base de datos si estamos en el cliente
-const initializeDBIfNeeded = async () => {
-  if (typeof window !== 'undefined') {
-    try {
-      // Importar de forma dinámica para evitar problemas con SSR
-      const { initializeDatabase } = await import('../services/dbService');
-      initializeDatabase();
-    } catch (error) {
-      console.error('Error initializing database:', error);
-    }
-  }
-};
-
 // Proveedor del Contexto
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Todos los hooks SIEMPRE se llaman en el mismo orden
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Inicializar DB y cargar usuario desde localStorage al inicio
+  // Cargar usuario desde localStorage y verificar sesión con cookies
   useEffect(() => {
+    let isMounted = true;
+
     const loadUser = async () => {
+      if (typeof window === 'undefined') return;
+
       try {
-        // Inicializar base de datos (precarga usuarios predefinidos)
-        await initializeDBIfNeeded();
-        
-        // Intentar cargar usuario de localStorage primero (más rápido)
-        const savedUser = getUserFromLocalStorage();
-        
-        if (savedUser) {
-          console.log('Usuario cargado desde localStorage:', savedUser.name);
-          setUser(savedUser);
-        } else {
-          // Si estamos en desarrollo, usar usuario demo para desarrollo
-          if (process.env.NODE_ENV === 'development') {
-            try {
-              // Importar el servicio de DB bajo demanda
-              const { getUserByEmail } = await import('@/services/dbService');
-              const demoUser = await getUserByEmail('elmer.zapata@example.com');
-              
-              if (demoUser) {
-                console.log('Usuario demo cargado para desarrollo:', demoUser.name);
-                setUser(demoUser);
-                // Guardar en localStorage para persistencia
-                localStorage.setItem('currentUser', JSON.stringify(demoUser));
-              }
-            } catch (e) {
-              console.error('Error cargando usuario demo:', e);
-            }
-          }
-          
-          // Si seguimos sin usuario y estamos en una ruta protegida, redirigir
-          if (!savedUser && typeof window !== 'undefined' && 
-              window.location.pathname.startsWith('/dashboard')) {
-            window.location.href = '/login';
+        // Primero intentar verificar sesión con cookies
+        const response = await fetch('/api/auth/verify', {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user && isMounted) {
+            setUser(data.user);
+            // Sincronizar con localStorage
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
             return;
           }
         }
-      } catch (err) {
-        console.error('Error loading user:', err);
-        setError('Error al cargar datos de usuario');
+
+        // Si falla la verificación por cookies, intentar con localStorage como fallback
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          try {
+            const userData = JSON.parse(storedUser) as User;
+            if (isMounted) {
+              setUser(userData);
+            }
+          } catch (e) {
+            console.error('Error parsing stored user:', e);
+            localStorage.removeItem('currentUser');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user session:', error);
+        
+        // Fallback a localStorage si hay error de red
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          try {
+            const userData = JSON.parse(storedUser) as User;
+            if (isMounted) {
+              setUser(userData);
+            }
+          } catch (e) {
+            console.error('Error parsing stored user:', e);
+            localStorage.removeItem('currentUser');
+          }
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadUser();
-    
-    // Suscribirse a eventos de almacenamiento para sincronizar entre pestañas
+
+    // Cleanup
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Solo se ejecuta una vez
+
+  // Segundo useEffect para eventos de storage
+  useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'currentUser') {
-        if (event.newValue) {
-          try {
-            const updatedUser = JSON.parse(event.newValue);
-            setUser(updatedUser);
-          } catch (e) {
-            console.error('Error parsing user from storage event:', e);
-          }
-        } else {
-          // Usuario eliminado
-          setUser(null);
+      if (event.key === 'currentUser' && event.newValue) {
+        try {
+          const updatedUser = JSON.parse(event.newValue) as User;
+          setUser(updatedUser);
+        } catch (e) {
+          console.error('Error parsing updated user from storage:', e);
         }
       }
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorageChange);
+      return () => window.removeEventListener('storage', handleStorageChange);
+    }
   }, []);
 
   // Actualizar usuario
-  const updateUser = (updates: Partial<User>) => {
-    setUser(prevUser => {
-      if (!prevUser) return null;
-      
-      const updatedUser = { ...prevUser, ...updates };
-      
-      // Guardar en localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+  const updateUser = async (updates: Partial<User>) => {
+    if (!user) return;
+
+    try {
+      // Actualizar en la base de datos vía API
+      const response = await fetch('/api/users', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include', // Incluir cookies automáticamente
+        body: JSON.stringify({
+          userId: user.id,
+          ...updates
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error updating user profile');
       }
+
+      const result = await response.json();
       
-      return updatedUser;
-    });
+      // Si la respuesta es exitosa, actualizar el estado local
+      if (result.success && result.user) {
+        setUser(prevUser => {
+          if (!prevUser) return null;
+          
+          const updatedUser = { ...prevUser, ...result.user };
+          
+          // Guardar en localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          }
+          
+          return updatedUser;
+        });
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      // Si falla la API, al menos actualizar localmente
+      setUser(prevUser => {
+        if (!prevUser) return null;
+        
+        const updatedUser = { ...prevUser, ...updates };
+        
+        // Guardar en localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        }
+        
+        return updatedUser;
+      });
+    }
   };
 
   // Manejar conexión/desconexión de redes sociales
@@ -199,43 +261,46 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(prev => {
       if (!prev) return null;
       
-      // Verificar que socialMedia existe antes de manipularlo
       const currentSocialMedia = prev.socialMedia || [];
-      
       const updatedSocialMedia = currentSocialMedia.map((sm) =>
         sm.platform === platform ? { ...sm, connected } : sm
       );
 
-      return { ...prev, socialMedia: updatedSocialMedia };
+      const updatedUser = { ...prev, socialMedia: updatedSocialMedia };
+      
+      // Guardar en localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      }
+
+      return updatedUser;
     });
 
-    // Simular notificación o feedback visual
-    if (connected) {
-      // Mostrar notificación de éxito
+    // Mostrar notificación si se conectó
+    if (connected && typeof window !== 'undefined') {
       const notification = document.createElement('div');
-      notification.className = 'fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md z-50 notification-toast';
-      notification.innerHTML = `<div class="flex"><div class="py-1"><svg class="h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div><div><p class="font-bold">Conexión exitosa</p><p>Conectado a ${platform} correctamente.</p></div></div>`;
+      notification.className = 'fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md z-50';
+      notification.innerHTML = `
+        <div class="flex">
+          <div class="py-1">
+            <svg class="h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="font-bold">Conexión exitosa</p>
+            <p>Conectado a ${platform} correctamente.</p>
+          </div>
+        </div>
+      `;
       document.body.appendChild(notification);
 
-      // Animar entrada y salida
-      gsap.fromTo(notification, 
-        { x: 50, opacity: 0 },
-        { 
-          x: 0, 
-          opacity: 1, 
-          duration: 0.5,
-          onComplete: () => {
-            setTimeout(() => {
-              gsap.to(notification, { 
-                x: 50, 
-                opacity: 0, 
-                duration: 0.5,
-                onComplete: () => notification.remove() 
-              });
-            }, 3000);
-          }
+      // Remover notificación después de 3 segundos
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
         }
-      );
+      }, 3000);
     }
   };
 
@@ -244,43 +309,31 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(prev => {
       if (!prev) return null;
       
-      // Animar contador de créditos si hay un elemento con ID "credit-counter"
+      const updatedUser = { ...prev, credits: prev.credits + amount };
+      
+      // Guardar en localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      }
+
+      // Animar contador si existe
       const creditCounter = document.getElementById('credit-counter');
       if (creditCounter) {
-        const originalValue = prev.credits;
-        const finalValue = originalValue + amount;
-        
-        // Crear animación de contador
-        let start = originalValue;
-        const duration = 1.5;
-        const interval = 30;
-        const totalSteps = duration * 1000 / interval;
-        const step = (finalValue - originalValue) / totalSteps;
-        
-        const updateCounter = () => {
-          start += step;
-          creditCounter.textContent = Math.round(start).toLocaleString();
-          
-          if ((step > 0 && start >= finalValue) || (step < 0 && start <= finalValue)) {
-            creditCounter.textContent = finalValue.toLocaleString();
-            clearInterval(animation);
-          }
-        };
-        
-        const animation = setInterval(updateCounter, interval);
+        const finalValue = updatedUser.credits;
+        creditCounter.textContent = finalValue.toLocaleString();
       }
       
-      return { ...prev, credits: prev.credits + amount };
+      return updatedUser;
     });
   };
 
   // Función para cerrar sesión
   const logout = () => {
-    // Limpiar información de usuario
     setUser(null);
+    setError(null);
+    
     if (typeof window !== 'undefined') {
       localStorage.removeItem('currentUser');
-      // Redirigir al login
       window.location.href = '/login';
     }
   };

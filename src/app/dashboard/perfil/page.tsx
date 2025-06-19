@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { User, Camera, Save, X, UserCog, Shield, Megaphone, Award } from 'lucide-react';
+import { User, Camera, Save, X, UserCog, Shield, Megaphone, Award, Facebook, Instagram, Share2, Linkedin, Youtube, Globe } from 'lucide-react';
+import { useUser } from '@/context/UserContext';
+import SocialNetworkConnector from '@/components/user/SocialNetworkConnectorFixed';
 
 interface ProfileFormData {
   nombre: string;
@@ -16,10 +18,12 @@ interface ProfileFormData {
 }
 
 export default function ProfilePage() {
+  const { user, updateUser } = useUser();
   const [userType, setUserType] = useState<'personal' | 'politico'>('personal');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('perfil'); // Nueva variable para las pestañas: 'perfil' o 'cuentas'
   const [formData, setFormData] = useState<ProfileFormData>({
     nombre: '',
     email: '',
@@ -32,33 +36,32 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    // Asegurarse de que estamos en el cliente antes de acceder a localStorage
-    if (typeof window !== 'undefined') {
-      // Cargar tipo de usuario desde localStorage
-      const storedType = localStorage.getItem('tipoPerfil');
-      if (storedType === 'politico' || storedType === 'personal') {
-        setUserType(storedType);
+    // Cargar datos reales del usuario desde el contexto
+    if (user) {
+      setFormData({
+        nombre: user.name || '',
+        email: user.email || '',
+        telefono: user.telefono || '',
+        empresa: user.empresa || '',
+        bio: user.bio || '',
+        partidoPolitico: user.partidoPolitico || '',
+        cargoActual: user.cargoActual || '',
+        propuestasPrincipales: user.propuestasPrincipales || '',
+      });
+      
+      // Establecer avatar si existe
+      if (user.avatar) {
+        setAvatar(user.avatar);
       }
       
-      // Simulación de carga de datos del usuario
-      setIsLoading(true);
-      setTimeout(() => {
-        setFormData({
-          nombre: 'Juan Pérez',
-          email: 'juan@example.com',
-          telefono: '+34 612 345 678',
-          empresa: userType === 'politico' ? 'Partido Democrático' : 'Empresa ABC',
-          bio: userType === 'politico' 
-            ? 'Político comprometido con el desarrollo sostenible y la transparencia en la gestión pública.' 
-            : 'Profesional con experiencia en marketing digital y gestión de reputación online.',
-          partidoPolitico: userType === 'politico' ? 'Partido Democrático' : '',
-          cargoActual: userType === 'politico' ? 'Candidato a Concejal' : '',
-          propuestasPrincipales: userType === 'politico' ? 'Transparencia, desarrollo sostenible, educación de calidad' : '',
-        });
-        setIsLoading(false);
-      }, 1000);
+      // Establecer tipo de usuario si existe en los datos
+      if (user.profileCategory) {
+        const isPolitico = user.profileCategory.toLowerCase().includes('político') || 
+                          user.profileCategory.toLowerCase().includes('gubernamental');
+        setUserType(isPolitico ? 'politico' : 'personal');
+      }
     }
-  }, [userType]);
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -113,9 +116,38 @@ export default function ProfilePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Sidebar con información general */}
-        <div className="col-span-1">
+      {/* Pestañas de navegación */}
+      <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
+        <ul className="flex flex-wrap -mb-px">
+          <li className="mr-2">
+            <button
+              onClick={() => setActiveTab('perfil')}
+              className={`inline-flex items-center py-4 px-4 text-sm font-medium text-center border-b-2 ${activeTab === 'perfil' 
+                ? 'text-[#01257D] border-[#01257D] dark:text-[#01257D] dark:border-[#01257D]' 
+                : 'border-transparent hover:text-[#01257D] hover:border-[#01257D] dark:hover:text-[#01257D]'}`}
+            >
+              <User className="mr-2 h-5 w-5" />
+              Información Personal
+            </button>
+          </li>
+          <li className="mr-2">
+            <button
+              onClick={() => setActiveTab('cuentas')}
+              className={`inline-flex items-center py-4 px-4 text-sm font-medium text-center border-b-2 ${activeTab === 'cuentas' 
+                ? 'text-[#01257D] border-[#01257D] dark:text-[#01257D] dark:border-[#01257D]' 
+                : 'border-transparent hover:text-[#01257D] hover:border-[#01257D] dark:hover:text-[#01257D]'}`}
+            >
+              <Share2 className="mr-2 h-5 w-5" />
+              Conectar Redes Sociales
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      {activeTab === 'perfil' ? (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Sidebar con información general */}
+          <div className="col-span-1">
           <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
             <div className="mb-6 flex flex-col items-center">
               <div className="relative mb-4">
@@ -126,7 +158,7 @@ export default function ProfilePage() {
                     className="h-32 w-32 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-32 w-32 items-center justify-center rounded-full bg-primary-100 text-primary dark:bg-primary-900 dark:text-primary-300">
+                  <div className="flex h-32 w-32 items-center justify-center rounded-full bg-[#01257D]-100 text-primary dark:bg-[#01257D]-900 dark:text-primary-300">
                     {userType === 'politico' ? 
                       <UserCog className="h-16 w-16" /> : 
                       <User className="h-16 w-16" />
@@ -135,7 +167,7 @@ export default function ProfilePage() {
                 )}
                 <label 
                   htmlFor="avatar-upload" 
-                  className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-primary-700"
+                  className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-[#01257D] text-white hover:bg-[#01257D]-700"
                 >
                   <Camera className="h-4 w-4" />
                 </label>
@@ -150,7 +182,7 @@ export default function ProfilePage() {
 
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">{formData.nombre}</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">{formData.email}</p>
-              <span className="mt-1 inline-flex items-center rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-primary dark:bg-primary-900 dark:text-primary-300">
+              <span className="mt-1 inline-flex items-center rounded-full bg-[#01257D]-100 px-3 py-1 text-xs font-medium text-primary dark:bg-[#01257D]-900 dark:text-primary-300">
                 {userType === 'politico' ? 'Perfil Político' : 'Persona Natural'}
               </span>
             </div>
@@ -206,7 +238,7 @@ export default function ProfilePage() {
                   name="nombre"
                   value={formData.nombre}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   required
                 />
               </div>
@@ -221,7 +253,7 @@ export default function ProfilePage() {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   required
                 />
               </div>
@@ -236,7 +268,7 @@ export default function ProfilePage() {
                   name="telefono"
                   value={formData.telefono}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
               </div>
               
@@ -250,7 +282,7 @@ export default function ProfilePage() {
                   name="empresa"
                   value={formData.empresa}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
               </div>
             </div>
@@ -265,7 +297,7 @@ export default function ProfilePage() {
                 rows={4}
                 value={formData.bio}
                 onChange={handleInputChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               ></textarea>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Breve descripción que aparecerá en tu perfil público.
@@ -290,7 +322,7 @@ export default function ProfilePage() {
                       name="cargoActual"
                       value={formData.cargoActual}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   </div>
                 </div>
@@ -305,7 +337,7 @@ export default function ProfilePage() {
                     rows={4}
                     value={formData.propuestasPrincipales}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   ></textarea>
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Resume tus principales propuestas políticas o áreas de interés.
@@ -317,7 +349,7 @@ export default function ProfilePage() {
             <div className="mt-8 flex justify-end space-x-3">
               <button
                 type="button"
-                className="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+                className="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 focus:outline-none dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
               >
                 <X className="mr-2 h-4 w-4" />
                 Cancelar
@@ -325,7 +357,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 dark:bg-primary-600 dark:hover:bg-primary-700"
+                className="inline-flex items-center rounded-lg bg-[#01257D] px-4 py-2 text-sm font-medium text-white hover:bg-[#013AAA] focus:outline-none focus:ring-4 focus:ring-[#01257D]/50 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
               >
                 {isSaving ? (
                   <>
@@ -343,6 +375,130 @@ export default function ProfilePage() {
           </form>
         </div>
       </div>
+    ) : (
+      /* Pestaña de Redes Sociales */
+      <div className="grid grid-cols-1 gap-6">
+        <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+          <h2 className="mb-6 text-xl font-bold text-gray-900 dark:text-white">Conectar Redes Sociales</h2>
+          <p className="mb-4 text-gray-600 dark:text-gray-400">
+            Conecta tus redes sociales para monitorear tu reputación online. Esto permitirá a la IA analizar menciones y sentimientos sobre tu marca o perfil.  
+          </p>
+          
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Facebook */}
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-4 flex items-center">
+                <div className="mr-3 rounded-full bg-blue-100 p-2 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+                  <Facebook className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-medium">Facebook</h3>
+              </div>
+              <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">Conecta tu perfil o página de Facebook</p>
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-[#01257D] px-4 py-2 text-center text-sm font-medium text-white hover:bg-[#013AAA] focus:outline-none focus:ring-4 focus:ring-[#01257D]/50 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
+              >
+                Conectar cuenta
+              </button>
+            </div>
+            
+            {/* X */}
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-4 flex items-center">
+                <div className="mr-3 rounded-full bg-gray-100 p-2 text-black dark:bg-gray-700 dark:text-white">
+                  <X className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-medium">X</h3>
+              </div>
+              <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">Conecta tu cuenta de X</p>
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-[#01257D] px-4 py-2 text-center text-sm font-medium text-white hover:bg-[#013AAA] focus:outline-none focus:ring-4 focus:ring-[#01257D]/50 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
+              >
+                Conectar cuenta
+              </button>
+            </div>
+            
+            {/* Instagram */}
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-4 flex items-center">
+                <div className="mr-3 rounded-full bg-pink-100 p-2 text-pink-600 dark:bg-pink-900 dark:text-pink-300">
+                  <Instagram className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-medium">Instagram</h3>
+              </div>
+              <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">Conecta tu cuenta de Instagram</p>
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-[#01257D] px-4 py-2 text-center text-sm font-medium text-white hover:bg-[#013AAA] focus:outline-none focus:ring-4 focus:ring-[#01257D]/50 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
+              >
+                Conectar cuenta
+              </button>
+            </div>
+            
+            {/* Threads */}
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-4 flex items-center">
+                <div className="mr-3 rounded-full bg-black p-2 text-white dark:bg-gray-700 dark:text-gray-300">
+                  <div className="flex h-6 w-6 items-center justify-center font-bold">@</div>
+                </div>
+                <h3 className="text-lg font-medium">Threads</h3>
+              </div>
+              <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">Conecta tu cuenta de Threads</p>
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-[#01257D] px-4 py-2 text-center text-sm font-medium text-white hover:bg-[#013AAA] focus:outline-none focus:ring-4 focus:ring-[#01257D]/50 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
+              >
+                Conectar cuenta
+              </button>
+            </div>
+            
+            {/* LinkedIn */}
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-4 flex items-center">
+                <div className="mr-3 rounded-full bg-blue-100 p-2 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                  <Linkedin className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-medium">LinkedIn</h3>
+              </div>
+              <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">Conecta tu perfil de LinkedIn</p>
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-[#01257D] px-4 py-2 text-center text-sm font-medium text-white hover:bg-[#013AAA] focus:outline-none focus:ring-4 focus:ring-[#01257D]/50 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
+              >
+                Conectar cuenta
+              </button>
+            </div>
+            
+            {/* YouTube */}
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-4 flex items-center">
+                <div className="mr-3 rounded-full bg-red-100 p-2 text-red-600 dark:bg-red-900 dark:text-red-300">
+                  <Youtube className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-medium">YouTube</h3>
+              </div>
+              <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">Conecta tu canal de YouTube</p>
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center rounded-lg bg-[#01257D] px-4 py-2 text-center text-sm font-medium text-white hover:bg-[#013AAA] focus:outline-none focus:ring-4 focus:ring-[#01257D]/50 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
+              >
+                Conectar cuenta
+              </button>
+            </div>
+          </div>
+          
+          <div className="mt-8 flex justify-end space-x-3">
+            <button
+              type="button"
+              className="inline-flex items-center rounded-lg bg-[#01257D] px-4 py-2 text-sm font-medium text-white hover:bg-[#013AAA] focus:outline-none focus:ring-4 focus:ring-[#01257D]/50 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
+            >
+              Guardar configuración
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }

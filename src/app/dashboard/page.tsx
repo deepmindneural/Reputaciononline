@@ -96,7 +96,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
           <p className="mt-1 text-gray-600 dark:text-gray-300">Bienvenido a tu centro de monitoreo de reputación online</p>
         </div>
-        <button className="button-primary flex items-center text-sm">
+        <button className="flex items-center text-sm px-4 py-2 bg-[#01257D] hover:bg-[#01257D]/90 text-white rounded-lg transition-colors duration-200">
           <RefreshCw className="mr-2 h-4 w-4" /> Actualizar Datos
         </button>
       </div>
@@ -125,7 +125,7 @@ export default function Dashboard() {
           </div>
           <div className="mt-4">
             <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-              <div className="h-2 rounded-full bg-primary-600" style={{ width: '70%' }}></div>
+              <div className="h-2 rounded-full bg-[#01257D]" style={{ width: '70%' }}></div>
             </div>
           </div>
           <div className="mt-2 text-xs text-gray-600 dark:text-gray-300">
@@ -278,7 +278,7 @@ export default function Dashboard() {
               </div>
               
               <div className="mt-4 text-center">
-                <button className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
+                <button className="text-sm font-medium text-[#01257D] hover:text-[#01257D]/90 dark:text-[#01257D] dark:hover:text-[#01257D]/90">
                   Ver todas las menciones <ArrowUpRight className="ml-1 inline h-4 w-4" />
                 </button>
               </div>
@@ -294,7 +294,7 @@ export default function Dashboard() {
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             <div className="p-4">
               <div className="flex items-center">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#01257D]/10 text-[#01257D] dark:bg-[#01257D]/20 dark:text-[#01257D]">
                   <RefreshCw className="h-4 w-4" />
                 </div>
                 <div className="ml-3">
@@ -308,7 +308,7 @@ export default function Dashboard() {
             
             <div className="p-4">
               <div className="flex items-center">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#01257D]/10 text-[#01257D] dark:bg-[#01257D]/20 dark:text-[#01257D]">
                   <CreditCard className="h-4 w-4" />
                 </div>
                 <div className="ml-3">
@@ -322,7 +322,7 @@ export default function Dashboard() {
             
             <div className="p-4">
               <div className="flex items-center">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#01257D]/10 text-[#01257D] dark:bg-[#01257D]/20 dark:text-[#01257D]">
                   <TrendingUp className="h-4 w-4" />
                 </div>
                 <div className="ml-3">
@@ -336,7 +336,7 @@ export default function Dashboard() {
             
             <div className="p-4">
               <div className="flex items-center">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#01257D]/10 text-[#01257D] dark:bg-[#01257D]/20 dark:text-[#01257D]">
                   <CreditCard className="h-4 w-4" />
                 </div>
                 <div className="ml-3">

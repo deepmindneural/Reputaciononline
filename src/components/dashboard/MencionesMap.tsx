@@ -51,7 +51,6 @@ const defaultIcon = L.divIcon({
 // Función para obtener el icono según la plataforma
 const getIconByPlatform = (platform: string) => {
   switch (platform.toLowerCase()) {
-    case 'twitter':
     case 'x':
       return xIcon;
     case 'facebook':
@@ -66,7 +65,6 @@ const getIconByPlatform = (platform: string) => {
 // Función para obtener el componente de icono según la plataforma
 const PlatformIcon = ({ platform }: { platform: string }) => {
   switch (platform.toLowerCase()) {
-    case 'twitter':
     case 'x':
       return <XLogo className="h-4 w-4" />;
     case 'facebook':

@@ -95,23 +95,33 @@ export default function LoginPage() {
       return;
     }
     
-    // Autenticación con IndexedDB
+    // Autenticación con API de Prisma
     try {
       setCargando(true);
       setError('');
       
-      // Importar el servicio de DB bajo demanda (para evitar errores de SSR)
-      const { verifyUserCredentials } = await import('@/services/dbService');
-      const user = await verifyUserCredentials(email, password);
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
       
-      if (user) {
+      if (data.success && data.user) {
         // Guardar usuario en localStorage para mantener la sesión
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
         
-        // Redirección a dashboard
-        window.location.href = '/dashboard';
+        // Redirección basada en onboarding
+        if (data.user.onboardingCompleted) {
+          window.location.href = '/dashboard';
+        } else {
+          window.location.href = '/onboarding';
+        }
       } else {
-        setError('Credenciales incorrectas. Por favor verifica tu correo y contraseña.');
+        setError(data.message || 'Credenciales incorrectas. Por favor verifica tu correo y contraseña.');
       }
     } catch (err) {
       console.error('Error de autenticación:', err);
@@ -124,7 +134,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Panel lateral - Solo visible en pantallas medianas y grandes */}
-      <div className="relative hidden w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 md:block">
+      <div className="relative hidden w-1/2 bg-[#01257D] md:block">
         <AnimatedBackground 
           className="opacity-40" 
           particleColor="rgba(255, 255, 255, 0.6)" 
@@ -132,46 +142,28 @@ export default function LoginPage() {
         <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-white">
           <div
             ref={titleRef}
-            className="mb-8 flex items-center"
+            className="mb-8 flex flex-col items-center text-center"
           >
-            <div className="mr-3 h-12 w-12 rounded-full bg-white bg-opacity-20"></div>
-            <h1 className="text-3xl font-bold">Reputación Online</h1>
+            {/* Logo ROL */}
+            <div className="mb-6">
+              <img 
+                src="/reputacion-online-logo.png" 
+                alt="ROL - Reputación Online" 
+                className="h-20 w-auto"
+              />
+            </div>
           </div>
           
           <h2 
             ref={subtitleRef}
-            className="mb-6 text-center text-2xl font-light"
+            className="text-center text-xl font-light leading-relaxed max-w-md"
           >
-            Gestiona tu presencia digital con análisis avanzados y monitoreo en tiempo real
+            Monitorea, analiza, gestiona y protege tu Reputación Online
           </h2>
-          
-          <div
-            ref={featuresRef}
-            className="mt-4 space-y-4"
-          >
-            <div className="flex items-center">
-              <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white bg-opacity-20">
-                <User className="h-5 w-5" />
-              </div>
-              <p>Análisis de sentimiento personalizado</p>
-            </div>
-            <div className="flex items-center">
-              <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white bg-opacity-20">
-                <User className="h-5 w-5" />
-              </div>
-              <p>Monitoreo de menciones en tiempo real</p>
-            </div>
-            <div className="flex items-center">
-              <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white bg-opacity-20">
-                <User className="h-5 w-5" />
-              </div>
-              <p>Gestión eficiente de créditos</p>
-            </div>
-          </div>
         </div>
         
         <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-white text-opacity-70">
-          © 2025 Reputación Online. Todos los derechos reservados.
+          2025 Reputación Online. Todos los derechos reservados.
         </div>
       </div>
       
@@ -183,7 +175,7 @@ export default function LoginPage() {
         >
           {/* Logo solo visible en móviles */}
           <div className="text-center md:hidden">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-600">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#01257D]">
               <div className="h-8 w-8 rounded-full bg-white"></div>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Reputación Online</h1>
@@ -221,7 +213,7 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full rounded-md border-gray-300 py-3 pl-10 placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                    className="block w-full rounded-md border-gray-300 py-3 pl-10 placeholder-gray-400 shadow-sm focus:border-[#01257D] focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     placeholder="usuario@empresa.com"
                   />
                 </div>
@@ -243,7 +235,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-10 placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                    className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-10 placeholder-gray-400 shadow-sm focus:border-[#01257D] focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     placeholder="••••••••"
                   />
                   <button
@@ -269,7 +261,7 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={recordarme}
                   onChange={(e) => setRecordarme(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                  className="h-4 w-4 rounded border-gray-300 text-[#01257D] focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700"
                 />
                 <label htmlFor="recordarme" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                   Recordarme
@@ -277,7 +269,7 @@ export default function LoginPage() {
               </div>
               
               <div className="text-sm">
-                <a href="#" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">
+                <a href="#" className="font-medium text-[#01257D] hover:text-[#013AAA] dark:text-[#01257D]">
                   ¿Olvidaste tu contraseña?
                 </a>
               </div>
@@ -287,7 +279,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={cargando}
-                className="group relative flex w-full justify-center rounded-md border border-transparent bg-primary-600 py-3 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-75 dark:bg-primary-700 dark:hover:bg-primary-600"
+                className="group relative flex w-full justify-center rounded-md border border-transparent bg-[#01257D] py-3 px-4 text-sm font-medium text-white shadow-sm hover:bg-[#013AAA] focus:outline-none focus:ring-2 focus:ring-[#01257D] focus:ring-offset-2 disabled:opacity-75 dark:bg-[#01257D] dark:hover:bg-[#013AAA]"
               >
                 {cargando ? (
                   <span className="flex items-center">
@@ -307,7 +299,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               ¿No tienes una cuenta?{' '}
-              <Link href="/register" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">
+              <Link href="/register" className="font-medium text-[#01257D] hover:text-[#013AAA] dark:text-[#01257D]">
                 Regístrate
               </Link>
             </p>

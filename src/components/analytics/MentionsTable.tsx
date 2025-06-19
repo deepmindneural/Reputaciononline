@@ -67,7 +67,6 @@ const MentionsTable: React.FC<MentionsTableProps> = ({ mentions, title }) => {
   // Obtener icono de plataforma
   const getPlatformIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
-      case 'twitter':
       case 'x':
         return <XLogo className="h-4 w-4" />;
       case 'facebook':

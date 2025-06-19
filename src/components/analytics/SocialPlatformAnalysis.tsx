@@ -61,7 +61,6 @@ const SocialPlatformAnalysis: React.FC<SocialPlatformAnalysisProps> = ({
     const iconProps = { size: 16, className: "mr-2" };
     
     switch (name.toLowerCase()) {
-      case 'twitter':
       case 'x':
         return <XLogo {...iconProps} className="text-black dark:text-white mr-2" />;
       case 'facebook':

@@ -17,6 +17,7 @@ const PREDEFINED_USERS = {
     plan: 'pro',
     credits: 2500,
     nextBillingDate: '2025-07-01T00:00:00Z',
+    onboardingCompleted: true, // Usuario con onboarding completo
     socialMedia: [
       {
         platform: 'x',
@@ -131,6 +132,7 @@ const PREDEFINED_USERS = {
     plan: 'basic',
     credits: 850,
     nextBillingDate: '2025-06-20T00:00:00Z',
+    onboardingCompleted: false, // Usuario sin onboarding completo
     socialMedia: [
       {
         platform: 'x',

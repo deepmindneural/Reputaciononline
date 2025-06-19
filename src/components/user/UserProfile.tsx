@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User as UserIcon, LogOut, Settings, CreditCard, Bell, ChevronDown, Calendar, Shield } from 'lucide-react';
+import { User as UserIcon, LogOut, Settings, CreditCard, Bell, ChevronDown, Calendar, Shield, Share2, Radio } from 'lucide-react';
 import Link from 'next/link';
 import { gsap } from 'gsap';
 import { useUser } from '@/context/UserContext';
@@ -220,6 +220,16 @@ const UserProfile = () => {
           <Link href="/dashboard/configuracion" className="menu-item flex w-full items-center px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
             <Settings className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
             Configuración
+          </Link>
+
+          <Link href="/dashboard/redes-sociales" className="menu-item flex w-full items-center px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
+            <Share2 className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
+            Redes Sociales
+          </Link>
+
+          <Link href="/dashboard/medios-de-comunicacion" className="menu-item flex w-full items-center px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
+            <Radio className="mr-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
+            Medios de Comunicación
           </Link>
 
           <button

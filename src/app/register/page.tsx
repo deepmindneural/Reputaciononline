@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [paso, setPaso] = useState(1); // Para el proceso de registro en 2 pasos
   const [tipoPerfil, setTipoPerfil] = useState<'personal'|'political'>('personal'); // Tipo de perfil: personal o político
+  const [plan, setPlan] = useState('basic'); // Plan seleccionado
   
   // Referencias para animaciones
   const titleRef = useRef<HTMLDivElement>(null);
@@ -175,99 +176,44 @@ export default function RegisterPage() {
       return;
     }
     
-    // Registro con IndexedDB
+    // Registro con API calls a Prisma
+    setCargando(true);
+    setError('');
+    
     try {
-      setCargando(true);
-      setError('');
-      
-      // Importar el servicio de DB bajo demanda (para evitar errores de SSR)
-      const { getUserByEmail, addUserWithCredentials } = await import('@/services/dbService');
-      
-      // Verificar que el correo no exista ya
-      const existingUser = await getUserByEmail(email);
-      if (existingUser) {
-        setError('Este correo electrónico ya está registrado. Prueba con otro o inicia sesión.');
-        setCargando(false);
-        return;
+      // Usar API endpoint correcto para registro
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name: nombre,
+          company: empresa,
+          profileType: tipoPerfil,
+          role: 'user',
+          plan,
+          credits: plan === 'basic' ? 500 : plan === 'pro' ? 5000 : 10000,
+          onboardingCompleted: false,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.user) {
+        // Guardar usuario en localStorage
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        
+        // Redirección al onboarding para completar el perfil
+        window.location.href = '/onboarding';
+      } else {
+        setError(data.message || 'Error al crear la cuenta. Inténtalo nuevamente.');
       }
-      
-      // Crear un nuevo usuario
-      const newUserId = `user_${Date.now()}`;
-      const currentDate = new Date().toISOString();
-      
-      // Datos del usuario
-      const userData = {
-        id: newUserId,
-        name: nombre,
-        email: email,
-        profileType: tipoPerfil,
-        avatarUrl: `https://randomuser.me/api/portraits/${tipoPerfil === 'political' ? 'men' : 'women'}/${Math.floor(Math.random() * 70)}.jpg`,
-        role: 'user' as 'user' | 'admin',
-        createdAt: currentDate,
-        lastLogin: currentDate,
-        plan: 'basic' as 'free' | 'basic' | 'pro' | 'enterprise',
-        credits: 500, // Créditos iniciales de bienvenida
-        nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días desde hoy
-        socialMedia: [
-          {
-            platform: 'x' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
-            username: '',
-            followers: 0,
-            connected: false,
-            profileUrl: ''
-          },
-          {
-            platform: 'facebook' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
-            username: '',
-            followers: 0,
-            connected: false,
-            profileUrl: ''
-          },
-          {
-            platform: 'instagram' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
-            username: '',
-            followers: 0,
-            connected: false,
-            profileUrl: ''
-          },
-          {
-            platform: 'linkedin' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
-            username: '',
-            followers: 0,
-            connected: false,
-            profileUrl: ''
-          },
-          {
-            platform: 'tiktok' as 'x' | 'facebook' | 'instagram' | 'linkedin' | 'tiktok',
-            username: '',
-            followers: 0,
-            connected: false,
-            profileUrl: ''
-          }
-        ],
-        reputation: {
-          score: 50,
-          previousScore: 50,
-          trend: 'stable' as 'up' | 'down' | 'stable',
-          positiveMentions: 0,
-          neutralMentions: 0,
-          negativeMentions: 0,
-          totalMentions: 0,
-          recentMentions: []
-        }
-      };
-      
-      // Registrar usuario en la BD
-      const user = await addUserWithCredentials(userData, password);
-      
-      // Guardar usuario en localStorage para mantener la sesión
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      
-      // Redirección a dashboard
-      window.location.href = '/dashboard';
-    } catch (err) {
-      console.error('Error de registro:', err);
-      setError('Error al registrar tu cuenta. Por favor intenta nuevamente.');
+    } catch (error) {
+      console.error('Error en registro:', error);
+      setError('Error de conexión. Intenta nuevamente.');
     } finally {
       setCargando(false);
     }
@@ -276,7 +222,7 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Panel lateral - Solo visible en pantallas medianas y grandes */}
-      <div className="relative hidden w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 md:block">
+      <div className="relative hidden w-1/2 bg-gradient-to-br from-[#01257D] to-[#013AAA] md:block">
         <AnimatedBackground 
           className="opacity-40" 
           particleColor="rgba(255, 255, 255, 0.6)" 
@@ -286,7 +232,13 @@ export default function RegisterPage() {
             ref={titleRef}
             className="mb-8 flex items-center"
           >
-            <div className="mr-3 h-12 w-12 rounded-full bg-white bg-opacity-20"></div>
+            <div className="mr-3">
+              <img 
+                src="/reputacion-online-logo.png" 
+                alt="ROL - Reputación Online" 
+                className="h-12 w-auto"
+              />
+            </div>
             <h1 className="text-3xl font-bold">Reputación Online</h1>
           </div>
           
@@ -321,7 +273,7 @@ export default function RegisterPage() {
         </div>
         
         <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-white text-opacity-70">
-          © 2025 Reputación Online. Todos los derechos reservados.
+          2025 Reputación Online. Todos los derechos reservados.
         </div>
       </div>
       
@@ -423,7 +375,7 @@ export default function RegisterPage() {
                       required
                       value={nombre}
                       onChange={(e) => setNombre(e.target.value)}
-                      className="block w-full rounded-md border-gray-300 py-3 pl-10 placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                      className="block w-full rounded-md border-gray-300 py-3 pl-10 placeholder-gray-400 shadow-sm focus:border-[#01257D] focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                       placeholder="Juan Pérez"
                     />
                   </div>
@@ -445,7 +397,7 @@ export default function RegisterPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="block w-full rounded-md border-gray-300 py-3 pl-10 placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                      className="block w-full rounded-md border-gray-300 py-3 pl-10 placeholder-gray-400 shadow-sm focus:border-[#01257D] focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                       placeholder="usuario@empresa.com"
                     />
                   </div>
@@ -467,7 +419,7 @@ export default function RegisterPage() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-10 placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                      className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-10 placeholder-gray-400 shadow-sm focus:border-[#01257D] focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                       placeholder="Mínimo 8 caracteres"
                     />
                     <button
@@ -500,7 +452,7 @@ export default function RegisterPage() {
                       required
                       value={confirmarPassword}
                       onChange={(e) => setConfirmarPassword(e.target.value)}
-                      className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-10 placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                      className="block w-full rounded-md border-gray-300 py-3 pl-10 pr-10 placeholder-gray-400 shadow-sm focus:border-[#01257D] focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                       placeholder="Confirma tu contraseña"
                     />
                     <button
@@ -521,7 +473,7 @@ export default function RegisterPage() {
               <div>
                 <button
                   type="submit"
-                  className="step-button step-option flex w-full items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-center text-base font-medium text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="step-button step-option flex w-full items-center justify-center rounded-lg bg-[#01257D] px-5 py-3 text-center text-base font-medium text-white hover:bg-[#013AAA] focus:ring-4 focus:ring-blue-300"
                   disabled={cargando}
                 >
                   {cargando ? 'Procesando...' : 'Continuar'}
@@ -545,7 +497,7 @@ export default function RegisterPage() {
                   type="text"
                   value={empresa}
                   onChange={(e) => setEmpresa(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 pl-10 text-gray-900 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-600 dark:focus:ring-primary-500 sm:text-sm"
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 pl-10 text-gray-900 placeholder-gray-500 focus:border-[#01257D] focus:ring-[#01257D] dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-[#01257D] dark:focus:ring-[#01257D]"
                   placeholder={tipoPerfil === 'political' ? 'Nombre del partido político o movimiento' : 'Nombre de tu empresa o marca'}
                 />
                   </div>
@@ -553,21 +505,77 @@ export default function RegisterPage() {
                 
                 <div className="rounded-md bg-gray-50 p-4 dark:bg-gray-800">
                   <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Selecciona tu plan inicial</h3>
-                  <div className="mt-3 space-y-2">
-                    <div className="flex items-center">
+                  <div className="mt-3 space-y-3">
+                    {/* Plan Básico */}
+                    <div className="flex items-start">
                       <input
                         id="plan-basico"
                         name="plan"
                         type="radio"
+                        value="basic"
                         defaultChecked
-                        className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                        className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-[#01257D]"
+                        onChange={(e) => setPlan(e.target.value)}
                       />
-                      <label htmlFor="plan-basico" className="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Plan Básico - <span className="font-bold text-primary-600 dark:text-primary-400">Gratuito</span>
-                      </label>
+                      <div className="ml-3 block">
+                        <label htmlFor="plan-basico" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Plan Básico - <span className="font-bold text-green-600">Gratuito</span>
+                        </label>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          • 500 créditos de bienvenida<br/>
+                          • Monitoreo básico de menciones<br/>
+                          • Análisis de sentimiento<br/>
+                          • Soporte por correo electrónico
+                        </div>
+                      </div>
                     </div>
-                    <div className="ml-7 text-xs text-gray-500 dark:text-gray-400">
-                      500 créditos de bienvenida para que comiences a monitorear tu reputación online.
+
+                    {/* Plan Pro */}
+                    <div className="flex items-start">
+                      <input
+                        id="plan-pro"
+                        name="plan"
+                        type="radio"
+                        value="pro"
+                        className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-[#01257D]"
+                        onChange={(e) => setPlan(e.target.value)}
+                      />
+                      <div className="ml-3 block">
+                        <label htmlFor="plan-pro" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Plan Pro - <span className="font-bold text-blue-600">$49.99/mes</span>
+                        </label>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          • 5,000 créditos mensuales<br/>
+                          • Monitoreo avanzado en tiempo real<br/>
+                          • Análisis de IA y tendencias<br/>
+                          • Reportes personalizados<br/>
+                          • Soporte prioritario
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Plan Enterprise */}
+                    <div className="flex items-start">
+                      <input
+                        id="plan-enterprise"
+                        name="plan"
+                        type="radio"
+                        value="enterprise"
+                        className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-[#01257D]"
+                        onChange={(e) => setPlan(e.target.value)}
+                      />
+                      <div className="ml-3 block">
+                        <label htmlFor="plan-enterprise" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Plan Enterprise - <span className="font-bold text-purple-600">$149.99/mes</span>
+                        </label>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          • Créditos ilimitados<br/>
+                          • Monitoreo global multi-idioma<br/>
+                          • API personalizada<br/>
+                          • Analítica predictiva con IA<br/>
+                          • Account manager dedicado
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -580,7 +588,7 @@ export default function RegisterPage() {
                       type="checkbox"
                       checked={aceptarTerminos}
                       onChange={(e) => setAceptarTerminos(e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-[#01257D]"
                     />
                   </div>
                   <div className="ml-3 text-sm">
@@ -597,8 +605,12 @@ export default function RegisterPage() {
               <div className="mt-4 flex justify-between space-x-4">
                 <button 
                   type="button" 
-                  onClick={() => setPaso(1)}
-                  className="step-button step-option flex w-full items-center justify-center rounded-lg bg-gray-200 px-5 py-3 text-center text-base font-medium text-gray-700 hover:bg-gray-300 focus:ring-4 focus:ring-gray-100 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setPaso(1);
+                  }}
+                  className="flex w-full items-center justify-center rounded-lg bg-gray-200 px-5 py-3 text-center text-base font-medium text-gray-700 hover:bg-gray-300 focus:ring-4 focus:ring-gray-100 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:focus:ring-gray-600"
                 >
                   Volver
                 </button>
@@ -606,7 +618,7 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={cargando}
-                  className="step-button step-option flex w-full items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-center text-base font-medium text-white hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-75"
+                  className="step-button step-option flex w-full items-center justify-center rounded-lg bg-[#01257D] px-5 py-3 text-center text-base font-medium text-white hover:bg-[#013AAA] focus:ring-4 focus:ring-blue-300"
                 >
                   {cargando ? (
                     <span className="flex items-center">

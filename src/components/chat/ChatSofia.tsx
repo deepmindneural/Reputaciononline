@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, ArrowUp, X, Minimize2, Maximize2, Paperclip, Smile } from 'lucide-react';
 import { gsap } from 'gsap';
 import { useUser } from '@/context/UserContext';
+import OpenAI from 'openai';
 
 interface Message {
   id: string;
@@ -11,6 +12,12 @@ interface Message {
   text: string;
   timestamp: Date;
 }
+
+// Inicializar el cliente de OpenAI con el token proporcionado
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
+  dangerouslyAllowBrowser: true // Permitir uso en el navegador (normalmente esto se haría desde el servidor)
+});
 
 const ChatSofia = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -104,7 +111,40 @@ const ChatSofia = () => {
     }, 1500);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Función para obtener respuesta de OpenAI
+  const getOpenAIResponse = async (userMessage: string): Promise<string> => {
+    try {
+      const userContext = user ? `El usuario es ${user.name}, tiene ${user.credits} créditos y usa un plan ${user.plan}.` : '';
+      
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system", 
+            content: `Eres Sofia, una asistente virtual para la plataforma de monitoreo de reputación online. 
+            Tu tono es profesional pero amigable. Tus respuestas son concisas y útiles. 
+            ${userContext}
+            Puedes ayudar con: análisis de menciones, gestión de redes sociales, analítica de sentimiento, gestión de créditos, y facturación.
+            Si no tienes información específica sobre algo, orienta al usuario a la sección correspondiente de la plataforma.
+            Responde en español y mantén un tono conversacional.`
+          },
+          ...messages.map(msg => ({ 
+            role: msg.sender === 'user' ? 'user' as const : 'assistant' as const, 
+            content: msg.text 
+          })),
+          { role: "user", content: userMessage }
+        ],
+        max_tokens: 250
+      });
+      
+      return response.choices[0]?.message?.content || "Lo siento, no pude procesar tu consulta. ¿Puedes intentar de nuevo?";
+    } catch (error) {
+      console.error("Error al obtener respuesta de OpenAI:", error);
+      return "Lo siento, ha ocurrido un error al procesar tu consulta. Por favor, intenta nuevamente en unos momentos.";
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() === '') return;
 
@@ -116,45 +156,35 @@ const ChatSofia = () => {
       timestamp: new Date()
     };
     
+    const currentMessage = message;
     setMessages((prev) => [...prev, userMessage]);
     setMessage('');
     simulateTyping();
 
-    // Simular respuesta de Sofia
-    setTimeout(() => {
-      let response = '';
+    try {
+      // Obtener respuesta de OpenAI
+      const aiResponse = await getOpenAIResponse(currentMessage);
       
-      // Personalizar respuestas según el contenido del mensaje
-      const lowerMsg = message.toLowerCase();
-      
-      if (lowerMsg.includes('hola') || lowerMsg.includes('saludos') || lowerMsg.includes('buenos días')) {
-        response = `¡Hola ${user?.name}! ¿En qué puedo ayudarte hoy?`;
-      } 
-      else if (lowerMsg.includes('ayuda') || lowerMsg.includes('cómo funciona')) {
-        response = 'Puedo ayudarte con información sobre tu reputación online, análisis de menciones, gestión de créditos y más. ¿Sobre qué necesitas ayuda específicamente?';
-      }
-      else if (lowerMsg.includes('crédito') || lowerMsg.includes('saldo') || lowerMsg.includes('factura')) {
-        response = `Actualmente tienes ${user?.credits} créditos disponibles en tu cuenta. Tu próxima fecha de facturación es el ${new Date(user?.nextBillingDate || '').toLocaleDateString()}.`;
-      }
-      else if (lowerMsg.includes('analisis') || lowerMsg.includes('analytics') || lowerMsg.includes('análisis') || lowerMsg.includes('estadísticas')) {
-        response = 'En el módulo de Analytics puedes consultar tu puntuación de reputación, menciones recientes y análisis de sentimiento. ¿Te gustaría un resumen de tus métricas actuales?';
-      }
-      else if (lowerMsg.includes('redes') || lowerMsg.includes('x') || lowerMsg.includes('facebook') || lowerMsg.includes('instagram')) {
-        response = 'Puedes conectar y gestionar todas tus redes sociales desde el módulo de Redes Sociales. ¿Necesitas ayuda para conectar alguna cuenta nueva?';
-      }
-      else {
-        response = 'Entiendo. ¿Puedes darme más detalles para ayudarte mejor con esa consulta?';
-      }
-
       const sofiaMessage: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'sofia',
-        text: response,
+        text: aiResponse,
         timestamp: new Date()
       };
       
+      setIsTyping(false);
       setMessages((prev) => [...prev, sofiaMessage]);
-    }, 2000);
+    } catch (error) {
+      console.error('Error al procesar la consulta:', error);
+      
+      setIsTyping(false);
+      setMessages((prev) => [...prev, {
+        id: (Date.now() + 1).toString(),
+        sender: 'sofia',
+        text: 'Lo siento, ha ocurrido un error al procesar tu consulta. Por favor, intenta nuevamente en unos momentos.',
+        timestamp: new Date()
+      }]);
+    }
   };
 
   return (

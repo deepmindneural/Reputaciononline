@@ -1,12 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Ignorar la verificación de la versión de Node.js
-  experimental: {
-    skipNodeCheck: true
-  },
-  // Otras configuraciones
+  // Configuraciones estándar
   reactStrictMode: true,
-  swcMinify: true
+  swcMinify: true,
+  images: {
+    domains: ['localhost', 'graph.facebook.com', 'pbs.twimg.com', 'media.licdn.com', 'yt3.ggpht.com'],
+  }
 };
 
 module.exports = nextConfig;
