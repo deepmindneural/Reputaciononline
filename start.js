@@ -7,8 +7,8 @@ console.log('🚀 Iniciando aplicación Reputación Online...');
 
 // Configurar variables de entorno requeridas si no están presentes
 if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'file:./prisma/dev.db';
-  console.log('🔧 DATABASE_URL configurada: file:./prisma/dev.db');
+  process.env.DATABASE_URL = 'file:/app/prisma/dev.db';
+  console.log('🔧 DATABASE_URL configurada: file:/app/prisma/dev.db');
 }
 
 if (!process.env.NEXTAUTH_SECRET) {
@@ -36,7 +36,7 @@ console.log('✅ Variables de entorno configuradas para runtime');
 const fs = require('fs');
 const path = require('path');
 
-const dbPath = './prisma/dev.db';
+const dbPath = '/app/prisma/dev.db';
 const dbDir = path.dirname(dbPath);
 
 // Crear directorio prisma si no existe
