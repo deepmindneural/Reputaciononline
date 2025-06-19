@@ -111,8 +111,8 @@ export default function LoginPage() {
       const data = await response.json();
       
       if (data.success && data.user) {
-        // Guardar usuario en localStorage para mantener la sesión
-        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        // La cookie de sesión ya se estableció en el backend
+        // NO usar localStorage - confiar únicamente en Prisma + cookies
         
         // Redirección basada en onboarding
         if (data.user.onboardingCompleted) {

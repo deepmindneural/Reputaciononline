@@ -90,21 +90,6 @@ interface UserContextType {
 // Crear el contexto
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Función para obtener usuario desde localStorage
-const getUserFromLocalStorage = (): User | null => {
-  if (typeof window === 'undefined') return null;
-  
-  const userStr = localStorage.getItem('currentUser');
-  if (!userStr) return null;
-  
-  try {
-    return JSON.parse(userStr) as User;
-  } catch (e) {
-    console.error('Error parsing user from localStorage:', e);
-    return null;
-  }
-};
-
 // Proveedor del Contexto
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Todos los hooks SIEMPRE se llaman en el mismo orden
@@ -112,7 +97,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar usuario desde localStorage y verificar sesión con cookies
+  // Cargar usuario desde cookies de Prisma y verificar sesión
   useEffect(() => {
     let isMounted = true;
 
@@ -120,7 +105,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (typeof window === 'undefined') return;
 
       try {
-        // Primero intentar verificar sesión con cookies
+        // Verificar sesión únicamente con cookies de Prisma
         const response = await fetch('/api/auth/verify', {
           method: 'GET',
           credentials: 'include'
@@ -130,40 +115,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           const data = await response.json();
           if (data.success && data.user && isMounted) {
             setUser(data.user);
-            // Sincronizar con localStorage
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
             return;
           }
         }
 
-        // Si falla la verificación por cookies, intentar con localStorage como fallback
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-          try {
-            const userData = JSON.parse(storedUser) as User;
-            if (isMounted) {
-              setUser(userData);
-            }
-          } catch (e) {
-            console.error('Error parsing stored user:', e);
-            localStorage.removeItem('currentUser');
-          }
+        // Si no hay sesión válida, usuario = null
+        if (isMounted) {
+          setUser(null);
         }
       } catch (error) {
         console.error('Error loading user session:', error);
-        
-        // Fallback a localStorage si hay error de red
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-          try {
-            const userData = JSON.parse(storedUser) as User;
-            if (isMounted) {
-              setUser(userData);
-            }
-          } catch (e) {
-            console.error('Error parsing stored user:', e);
-            localStorage.removeItem('currentUser');
-          }
+        if (isMounted) {
+          setUser(null);
         }
       } finally {
         if (isMounted) {
@@ -174,29 +137,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     loadUser();
 
-    // Cleanup
     return () => {
       isMounted = false;
     };
-  }, []); // Solo se ejecuta una vez
-
-  // Segundo useEffect para eventos de storage
-  useEffect(() => {
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'currentUser' && event.newValue) {
-        try {
-          const updatedUser = JSON.parse(event.newValue) as User;
-          setUser(updatedUser);
-        } catch (e) {
-          console.error('Error parsing updated user from storage:', e);
-        }
-      }
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', handleStorageChange);
-      return () => window.removeEventListener('storage', handleStorageChange);
-    }
   }, []);
 
   // Actualizar usuario
@@ -230,11 +173,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           
           const updatedUser = { ...prevUser, ...result.user };
           
-          // Guardar en localStorage
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-          }
-          
           return updatedUser;
         });
       }
@@ -245,11 +183,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (!prevUser) return null;
         
         const updatedUser = { ...prevUser, ...updates };
-        
-        // Guardar en localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-        }
         
         return updatedUser;
       });
@@ -268,11 +201,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const updatedUser = { ...prev, socialMedia: updatedSocialMedia };
       
-      // Guardar en localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      }
-
       return updatedUser;
     });
 
@@ -311,20 +239,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       const updatedUser = { ...prev, credits: prev.credits + amount };
       
-      // Guardar en localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      }
-
-      // Animar contador si existe
-      const creditCounter = document.getElementById('credit-counter');
-      if (creditCounter) {
-        const finalValue = updatedUser.credits;
-        creditCounter.textContent = finalValue.toLocaleString();
-      }
-      
       return updatedUser;
     });
+
+    // Animar contador si existe
+    const creditCounter = document.getElementById('credit-counter');
+    if (creditCounter && user) {
+      const finalValue = user.credits + amount;
+      creditCounter.textContent = finalValue?.toLocaleString() || '0';
+    }
   };
 
   // Función para cerrar sesión
@@ -333,7 +256,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('currentUser');
       window.location.href = '/login';
     }
   };
