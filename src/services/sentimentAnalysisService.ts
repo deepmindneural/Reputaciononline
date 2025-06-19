@@ -1,10 +1,27 @@
 import OpenAI from 'openai';
 import { SocialPost } from './socialMediaService';
 
-// Configurar OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+// Inicializaremos OpenAI perezosamente para evitar problemas durante la compilación
+let openaiClient: OpenAI | null = null;
+
+// Función para obtener el cliente de OpenAI solo cuando se necesite
+function getOpenAIClient() {
+  if (!openaiClient) {
+    // Verificamos que la clave esté disponible
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      console.warn('OPENAI_API_KEY no está configurada. El análisis de sentimiento no funcionará.');
+      // Regresamos una instancia vacía que luego manejaremos en los métodos
+      return null;
+    }
+    
+    // Inicializar el cliente solo la primera vez que se necesite
+    openaiClient = new OpenAI({
+      apiKey,
+    });
+  }
+  return openaiClient;
+}
 
 export interface SentimentResult {
   sentiment: 'positive' | 'negative' | 'neutral';
@@ -33,6 +50,21 @@ export class SentimentAnalysisService {
           score: 50,
           confidence: 0,
           keywords: [],
+          emotions: []
+        };
+      }
+      
+      // Obtener cliente de OpenAI
+      const openai = getOpenAIClient();
+      
+      // Si no hay cliente disponible, devolver un resultado neutral
+      if (!openai) {
+        console.warn('No se pudo analizar el sentimiento porque la API key de OpenAI no está configurada');
+        return {
+          sentiment: 'neutral',
+          score: 50,
+          confidence: 0,
+          keywords: ['api_no_disponible'],
           emotions: []
         };
       }
