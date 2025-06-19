@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "node start.js",
     "lint": "next lint",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "node prisma/seed.js",
