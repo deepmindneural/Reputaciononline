@@ -6,11 +6,33 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import SocialNetworkConnectorFixed from '@/components/user/SocialNetworkConnectorFixed';
 import { useUser } from '@/context/UserContext';
 
+interface SocialConnection {
+  connected: boolean;
+  username: string;
+  displayName: string;
+  followers: number;
+  profileImage: string;
+  lastSync: string | null;
+  metrics: {
+    posts: number;
+    engagement: number;
+    reach: number;
+  };
+}
+
+interface SocialConnectionsState {
+  facebook: SocialConnection;
+  instagram: SocialConnection;
+  x: SocialConnection;
+  linkedin: SocialConnection;
+  tiktok: SocialConnection;
+}
+
 export default function RedesSocialesPage() {
   const { user } = useUser();
 
-  const handleSocialConnectionComplete = (connectedNetworks: string[]) => {
-    console.log('Redes sociales conectadas:', connectedNetworks);
+  const handleSocialConnectionComplete = (networks: SocialConnectionsState) => {
+    console.log('Redes sociales conectadas:', networks);
     // Aquí podrías mostrar una notificación de éxito o realizar otras acciones
   };
 
