@@ -1,3 +1,6 @@
+// Configurar variables de entorno antes de inicializar Prisma
+import '../../lib/env-setup.js';
+
 import { PrismaClient } from '@prisma/client';
 
 declare global {
