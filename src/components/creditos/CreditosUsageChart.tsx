@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCreditosContext } from '@/context/CreditosContext';
+import { useCredits } from '@/context/CreditosContext';
 import { motion } from 'framer-motion';
 
 interface ChartData {
@@ -12,7 +12,7 @@ interface ChartData {
 }
 
 export default function CreditosUsageChart() {
-  const { disponibles, historial } = useCreditosContext();
+  const { currentBalance, transactions } = useCredits();
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState<'semana' | 'mes' | 'año'>('mes');
   
   // Generar datos para el gráfico de dona (distribución por canal)
@@ -21,14 +21,14 @@ export default function CreditosUsageChart() {
     const consumosPorCanal: Record<string, number> = {};
     
     // Filtrar por transacciones de tipo egreso (consumo)
-    historial
-      .filter(tx => tx.tipo === 'egreso')
+    transactions
+      .filter(tx => tx.type === 'usage')
       .forEach(tx => {
-        const canal = tx.canal || 'general';
+        const canal = tx.service || 'general';
         if (!consumosPorCanal[canal]) {
           consumosPorCanal[canal] = 0;
         }
-        consumosPorCanal[canal] += tx.monto;
+        consumosPorCanal[canal] += Math.abs(tx.amount);
       });
     
     // Si no hay datos (historial vacío), mostrar datos de ejemplo
@@ -164,6 +164,30 @@ export default function CreditosUsageChart() {
     );
   };
   
+  // Filtrar transacciones según el período
+  const filtrarTransacciones = (periodo: 'semana' | 'mes' | 'año') => {
+    const ahora = new Date();
+    const fechaLimite = new Date();
+    
+    switch (periodo) {
+      case 'semana':
+        fechaLimite.setDate(ahora.getDate() - 7);
+        break;
+      case 'mes':
+        fechaLimite.setMonth(ahora.getMonth() - 1);
+        break;
+      case 'año':
+        fechaLimite.setFullYear(ahora.getFullYear() - 1);
+        break;
+    }
+    
+    return transactions.filter((tx: any) => new Date(tx.date) >= fechaLimite);
+  };
+
+  const transaccionesFiltradas = filtrarTransacciones(periodoSeleccionado);
+  const creditosUsados = transaccionesFiltradas.filter((tx: any) => tx.type === 'usage')
+    .reduce((sum: number, tx: any) => sum + Math.abs(tx.amount), 0);
+  
   return (
     <div className="card p-4 sm:p-6">
       <h2 className="heading-secondary mb-4">Uso de Créditos</h2>
@@ -216,12 +240,12 @@ export default function CreditosUsageChart() {
             <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
               <p className="text-xs text-gray-500 dark:text-gray-400">Promedio Diario</p>
               <p className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                {Math.round(totalConsumo / 30)} créditos
+                {Math.round(creditosUsados / 30)} créditos
               </p>
               <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-600">
                 <div 
                   className="h-1 rounded-full bg-primary-500" 
-                  style={{ width: `${Math.min((totalConsumo / 30) / (totalConsumo / 10) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((creditosUsados / 30) / (creditosUsados / 10) * 100, 100)}%` }}
                 />
               </div>
             </div>
@@ -242,7 +266,7 @@ export default function CreditosUsageChart() {
               <p className="text-sm text-blue-800 dark:text-blue-300">
                 Con tu uso actual, tus créditos durarán aproximadamente {' '}
                 <span className="font-bold">
-                  {Math.round(disponibles / (totalConsumo / 30))} días
+                  {Math.round(currentBalance / (creditosUsados / 30))} días
                 </span>.
               </p>
             </div>

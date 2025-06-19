@@ -275,7 +275,6 @@ const MediosComunicacionPage = () => {
                       }`} />
                     ) : (
                       <Globe className={`h-5 w-5 ${
-                        media.type === 'traditional' ? 'text-blue-600 dark:text-blue-400' :
                         media.type === 'digital' ? 'text-green-600 dark:text-green-400' :
                         'text-purple-600 dark:text-purple-400'
                       }`} />

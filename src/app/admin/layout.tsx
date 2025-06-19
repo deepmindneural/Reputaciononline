@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { CreditosProvider } from '@/context/CreditosContext';
+import { CreditProvider } from '@/context/CreditosContext';
 import { 
   Home, CreditCard, BarChart3, Settings, Bell, Users, 
   Search, User, LogOut, Menu, X, Database, Globe
@@ -10,7 +10,7 @@ import {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <CreditosProvider>
+    <CreditProvider>
       <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
         {/* Barra lateral con estilo AdminLTE */}
         <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 flex-shrink-0 transform flex-col bg-gray-800 transition-transform duration-300 dark:bg-gray-900 md:flex md:translate-x-0">
@@ -139,6 +139,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </main>
         </div>
       </div>
-    </CreditosProvider>
+    </CreditProvider>
   );
 }

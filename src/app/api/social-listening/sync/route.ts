@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       console.log(`Procesando ${metrics.platform} - ${metrics.recentPosts.length} posts`)
       
       // Analizar sentimiento de los posts recientes
-      let sentimentResults = []
+      let sentimentResults: any[] = []
       if (metrics.recentPosts.length > 0) {
         sentimentResults = await sentimentAnalysisService.analyzeBatchSentiment(metrics.recentPosts)
       }
