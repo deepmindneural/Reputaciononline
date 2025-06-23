@@ -10,10 +10,12 @@ export async function POST(request: NextRequest) {
     });
 
     // Eliminar cookie de autenticación
+    const isSecure = process.env.NEXTAUTH_URL?.startsWith('https');
     response.cookies.set('auth-token', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: Boolean(isSecure),
       sameSite: 'lax',
+      path: '/',
       maxAge: 0 // Expira inmediatamente
     });
 
