@@ -42,10 +42,12 @@ export async function POST(request: NextRequest) {
 
     if (result.token) {
       console.log('🔍 LOGIN: Estableciendo cookie auth-token');
+      const isSecure = process.env.NEXTAUTH_URL?.startsWith('https');
       response.cookies.set('auth-token', result.token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: Boolean(isSecure),
         sameSite: 'lax',
+        path: '/',
         maxAge: 7 * 24 * 60 * 60 // 7 días
       });
     } else {
